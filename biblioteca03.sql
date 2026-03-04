@@ -35,6 +35,9 @@ CREATE TABLE Livros (
 
 	PRIMARY KEY (id_livro)
 );
+
+CREATE INDEX idx_livro_id_livro
+ON Livros (id_livro);
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Generos (
 	id_genero INT NOT NULL,
@@ -42,6 +45,9 @@ CREATE TABLE Generos (
 
 	PRIMARY KEY (id_genero)
 );
+
+CREATE INDEX idx_livro_id_livro
+ON Livros (id_livro);
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Genero_livro (
 	id_genero INT NOT NULL, 
@@ -58,6 +64,9 @@ CREATE TABLE Autores (
 	
 	PRIMARY KEY (id_autor)
 );
+
+CREATE INDEX idx_livro_id_livro
+ON Livros (id_livro);
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Livro_Autor(
 	id_livro INT NOT NULL,

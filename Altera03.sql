@@ -122,10 +122,18 @@ CREATE TABLE Logs(
 	FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
 	FOREIGN KEY (id_funcionario) REFERENCES Funcionarios(id_funcionario)
 );
+------------------------------------------------------------------------------------------------------------------------
+--Criação de indeces
 
+CREATE INDEX idx_livro_id_livro
+ON Livros (id_livro);
 
+CREATE INDEX idx_autores_id_autor
+ON Autores (id_autor);
 
-
+CREATE INDEX idx_generos_id_genero
+ON Generos (id_genero);
+------------------------------------------------------------------------------------------------------------------------
 
 
 
