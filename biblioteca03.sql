@@ -1,10 +1,22 @@
---CREATE DOMAIN dm_padrao VARCHAR (80);
+CREATE DOMAIN dm_padrao VARCHAR (80);
 
 --VERSÃO 3
 
 
 -- Tudo depois do senha_cliente é novo
 
+------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE Funcionarios (
+	id_funcionario INT NOT NULL,
+	nome dm_padrao NOT NULL,
+	email VARCHAR(150) UNIQUE NOT NULL,
+	senha VARCHAR(250) NOT NULL,
+	perfil  CHAR (1) NOT NULL,
+
+	PRIMARY KEY (id_funcionario)
+
+);
+------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Clientes (
 	id_cliente INT NOT NULL,
 	nome_cliente dm_padrao NOT NULL,
@@ -15,8 +27,8 @@ CREATE TABLE Clientes (
 	email dm_padrao UNIQUE NOT NULL,
 	endereco dm_padrao NOT NULL,
 	bloqueado BOOLEAN NOT NULL DEFAULT FALSE, 
-	tentativas_login INT NOT NULL DEFAULT,
-	email_confirmado BOOLEAN NOT NULL DEFAULT 0 FALSE,
+	tentativas_login INT NOT NULL DEFAULT 0,
+	email_confirmado BOOLEAN NOT NULL DEFAULT FALSE,
 
 	PRIMARY KEY (id_cliente)
 	
@@ -35,9 +47,6 @@ CREATE TABLE Livros (
 
 	PRIMARY KEY (id_livro)
 );
-
-CREATE INDEX idx_livro_id_livro
-ON Livros (id_livro);
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Generos (
 	id_genero INT NOT NULL,
@@ -46,8 +55,6 @@ CREATE TABLE Generos (
 	PRIMARY KEY (id_genero)
 );
 
-CREATE INDEX idx_livro_id_livro
-ON Livros (id_livro);
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Genero_livro (
 	id_genero INT NOT NULL, 
@@ -84,41 +91,6 @@ CREATE TABLE Fotos (
 
 	PRIMARY KEY (id_foto),
 	FOREIGN KEY (id_livro) REFERENCES Livros(id_livro)
-);
--------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE Reservas (
-	id_reserva INT NOT NULL,
-	id_cliente INT NOT NULL,
-	id_livro INT NOT NULL,
-	id_funcionario_retirada INT,
-	id_funcionario_devolucao INT,
-	data_reserva DATE NOT NULL,
-	data_limite_retirada DATE,
-	data_retirada DATE,
-	data_prevista_devolucao DATE,
-	data_devolucao DATE,
-	status_reserva CHAR(15) NOT NULL DEFAULT 'reservado',
-	codigo_reserva INT,
-
-	PRIMARY KEY (id_reserva),
-	FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
-	FOREIGN KEY (id_livro) REFERENCES Livros(id_livro),
-	FOREIGN KEY (id_funcionario_retirada) REFERENCES Funcionarios(id_funcionario),
-	FOREIGN KEY (id_funcionario_devolucao) REFERENCES Funcionarios(id_funcionario),
-
-	CHECK (status_reserva IN ('reservado','emprestado','devolvido','cancelado','atrasado'))
-);
-------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE Multas (
-	id_multa INT NOT NULL,
-	id_reserva INT NOT NULL UNIQUE ,
-	valor_multa DECIMAL(5,2) NOT NULL,
-	data_multa DATE NOT NULL,
-	status_multa CHAR(8) NOT NULL,
-	data_pagamento DATE,
-
-	PRIMARY KEY (id_multa),
-	FOREIGN KEY (id_reserva) REFERENCES Reservas(id_reserva)
 );
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Historico_cliente (
@@ -158,19 +130,43 @@ CREATE TABLE Movimentacao_estoque (
 	PRIMARY KEY (id_movimentacao),
 	FOREIGN KEY (id_livro) REFERENCES Livros(id_livro)
 );
+
+-------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE Reservas (
+	id_reserva INT NOT NULL,
+	id_cliente INT NOT NULL,
+	id_livro INT NOT NULL,
+	id_funcionario_retirada INT,
+	id_funcionario_devolucao INT,
+	data_reserva DATE NOT NULL,
+	data_limite_retirada DATE,
+	data_retirada DATE,
+	data_prevista_devolucao DATE,
+	data_devolucao DATE,
+	status_reserva CHAR(15) NOT NULL DEFAULT 'reservado',
+	codigo_reserva INT,
+
+	PRIMARY KEY (id_reserva),
+	FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
+	FOREIGN KEY (id_livro) REFERENCES Livros(id_livro),
+	FOREIGN KEY (id_funcionario_retirada) REFERENCES Funcionarios(id_funcionario),
+	FOREIGN KEY (id_funcionario_devolucao) REFERENCES Funcionarios(id_funcionario),
+
+	CHECK (status_reserva IN ('reservado','emprestado','devolvido','cancelado','atrasado'))
+);
 ------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE Funcionarios (
-	id_funcionario INT NOT NULL,
-	nome dm_padrao NOT NULL,
-	email VARCHAR(150) UNIQUE NOT NULL,
-	senha VARCHAR(250) NOT NULL,
-	perfil  CHAR (1) NOT NULL,
+CREATE TABLE Multas (
+	id_multa INT NOT NULL,
+	id_reserva INT NOT NULL UNIQUE ,
+	valor_multa DECIMAL(5,2) NOT NULL,
+	data_multa DATE NOT NULL,
+	status_multa CHAR(8) NOT NULL,
+	data_pagamento DATE,
 
-	PRIMARY KEY (id_funcionario)
-
+	PRIMARY KEY (id_multa),
+	FOREIGN KEY (id_reserva) REFERENCES Reservas(id_reserva)
 );
 --------------------------------------------------------------------------------------------------------------------------
-
 CREATE TABLE Logs(	
 	id_log INT GENERATED ALWAYS AS IDENTITY, 
 	id_cliente INT, 
@@ -197,25 +193,3 @@ CREATE TABLE Logs(
 --P = perda
 --A = ajuste
 --X = danificado
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
