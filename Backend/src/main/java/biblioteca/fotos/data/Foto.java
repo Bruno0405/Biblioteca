@@ -4,7 +4,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "fotos")
+@Table(name = "Fotos")
 public class Foto extends PanacheEntityBase {
 
     @Id
