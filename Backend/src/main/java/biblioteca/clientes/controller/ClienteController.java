@@ -106,6 +106,7 @@ public class ClienteController {
         cliente.setBloqueado(dto.getBloqueado() != null ? dto.getBloqueado() : false);
         cliente.setTentativasLogin(dto.getTentativasLogin() != null ? dto.getTentativasLogin() : 0);
         cliente.setEmailConfirmado(dto.getEmailConfirmado() != null ? dto.getEmailConfirmado() : false);
+        cliente.setSenhaCliente(dto.getSenhaCliente());
         return cliente;
     }
 }

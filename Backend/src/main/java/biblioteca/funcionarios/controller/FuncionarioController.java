@@ -88,6 +88,7 @@ public class FuncionarioController {
         funcionario.setNome(dto.getNome());
         funcionario.setEmail(dto.getEmail());
         funcionario.setPerfil(dto.getPerfil());
+        funcionario.setSenha(dto.getSenha());
         return funcionario;
     }
 }

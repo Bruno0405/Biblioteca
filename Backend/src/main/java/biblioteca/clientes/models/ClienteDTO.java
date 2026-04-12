@@ -14,6 +14,7 @@ public class ClienteDTO {
     private Boolean bloqueado;
     private Integer tentativasLogin;
     private Boolean emailConfirmado;
+    private String senhaCliente;
 
     public Integer getIdCliente() {
         return idCliente;
@@ -55,6 +56,13 @@ public class ClienteDTO {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSenhaCliente() {
+        return senhaCliente;
+    }
+    public void setSenhaCliente(String senhaCliente) {
+        this.senhaCliente = senhaCliente;
     }
 
     public String getEndereco() {
