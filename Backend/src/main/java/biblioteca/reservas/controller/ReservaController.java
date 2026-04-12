@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.QueryParam;
 import java.util.List;
 
 @Path("/reservas")
@@ -19,8 +20,23 @@ public class ReservaController {
     RepositorioReservas repositorioReservas;
 
     @GET
-    public Response listarTodos() {
-        List<Reserva> reservas = repositorioReservas.listAll();
+    public Response listarTodos(
+            @QueryParam("idCliente") Integer idCliente,
+            @QueryParam("idLivro") Integer idLivro,
+            @QueryParam("status") String status) {
+
+        List<Reserva> reservas;
+
+        if (idCliente != null) {
+            reservas = repositorioReservas.list("idCliente", idCliente);
+        } else if (idLivro != null) {
+            reservas = repositorioReservas.list("idLivro", idLivro);
+        } else if (status != null) {
+            reservas = repositorioReservas.list("statusReserva", status);
+        } else {
+            reservas = repositorioReservas.listAll();
+        }
+
         List<ReservaDTO> reservasDTO = reservas.stream()
                 .map(this::transformeEmDto)
                 .toList();

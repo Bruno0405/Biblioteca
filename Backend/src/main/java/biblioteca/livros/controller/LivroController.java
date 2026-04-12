@@ -13,6 +13,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
@@ -26,8 +27,21 @@ public class LivroController {
     RepositorioLivros repositorioLivros;
 
     @GET
-    public Response listarTodos() {
-        List<Livro> livros = repositorioLivros.listAll();
+    public Response listarTodos(@QueryParam("nome") String nome,
+                                @QueryParam("editora") String editora,
+                                @QueryParam("ano") Integer ano) {
+        List<Livro> livros;
+
+        // Filtra por ano, editora ou nome, se os parâmetros estiverem vazios, lista tudo
+        if (nome != null) {
+            livros = repositorioLivros.list("LOWER(nomeLivro) LIKE LOWER(?1)", "%" + nome + "%");
+        } else if (editora != null) {
+            livros = repositorioLivros.list("LOWER(editora) LIKE LOWER(?1)", "%" + editora + "%");
+        } else if (ano != null) {
+            livros = repositorioLivros.list("ano", ano);
+        } else {
+            livros = repositorioLivros.listAll();
+        }
 
         List<LivroDTO> livrosDTO = livros.stream()
                 .map(this::tranformeEmDto)

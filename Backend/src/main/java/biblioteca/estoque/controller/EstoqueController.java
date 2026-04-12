@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.QueryParam;
 import java.util.List;
 
 @Path("/estoque")
@@ -19,8 +20,20 @@ public class EstoqueController {
     RepositorioEstoque repositorioEstoque;
 
     @GET
-    public Response listarTodos() {
-        List<Estoque> estoques = repositorioEstoque.listAll();
+    public Response listarTodos(
+            @QueryParam("idLivro") Integer idLivro,
+            @QueryParam("disponivel") Boolean disponivel) {
+
+        List<Estoque> estoques;
+
+        if (idLivro != null) {
+            estoques = repositorioEstoque.list("idLivro", idLivro);
+        } else if (disponivel != null && disponivel) {
+            estoques = repositorioEstoque.list("quantidadeTotal - quantidadeReservada - quantidadeEmprestada > 0");
+        } else {
+            estoques = repositorioEstoque.listAll();
+        }
+
         List<EstoqueDTO> estoquesDTO = estoques.stream()
                 .map(this::transformeEmDto)
                 .toList();

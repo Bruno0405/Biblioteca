@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.QueryParam;
 import java.util.List;
 
 @Path("/multas")
@@ -19,8 +20,20 @@ public class MultaController {
     RepositorioMultas repositorioMultas;
 
     @GET
-    public Response listarTodos() {
-        List<Multa> multas = repositorioMultas.listAll();
+    public Response listarTodos(
+            @QueryParam("idReserva") Integer idReserva,
+            @QueryParam("status") String status) {
+
+        List<Multa> multas;
+
+        if (idReserva != null) {
+            multas = repositorioMultas.list("idReserva", idReserva);
+        } else if (status != null) {
+            multas = repositorioMultas.list("statusMulta", status);
+        } else {
+            multas = repositorioMultas.listAll();
+        }
+
         List<MultaDTO> multasDTO = multas.stream()
                 .map(this::transformeEmDto)
                 .toList();
