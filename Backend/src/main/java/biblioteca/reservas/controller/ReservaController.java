@@ -1,5 +1,9 @@
 package biblioteca.reservas.controller;
 
+import biblioteca.estoque.data.Estoque;
+import biblioteca.estoque.repository.RepositorioEstoque;
+import biblioteca.multas.data.Multa;
+import biblioteca.multas.repository.RepositorioMultas;
 import biblioteca.reservas.data.Reserva;
 import biblioteca.reservas.models.ReservaDTO;
 import biblioteca.reservas.repository.RepositorioReservas;
@@ -9,6 +13,9 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.QueryParam;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Path("/reservas")
@@ -18,6 +25,12 @@ public class ReservaController {
 
     @Inject
     RepositorioReservas repositorioReservas;
+
+    @Inject
+    RepositorioEstoque repositorioEstoque;
+
+    @Inject
+    RepositorioMultas repositorioMultas;
 
     @GET
     public Response listarTodos(
@@ -56,8 +69,33 @@ public class ReservaController {
     @POST
     @Transactional
     public Response criar(ReservaDTO reservaDTO) {
+        Estoque estoque = repositorioEstoque.find("idLivro", reservaDTO.getIdLivro()).firstResult();
+
+        if (estoque == null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("O livro informado não possui estoque.")
+                    .build();
+        }
+
+        int disponivel = estoque.getQuantidadeTotal()
+                - estoque.getQuantidadeReservada()
+                - estoque.getQuantidadeEmprestada()
+                - estoque.getQuantidadeDanificada();
+
+        if (disponivel <= 0) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Livro sem estoque disponível para reserva.")
+                    .build();
+        }
+
+        estoque.setQuantidadeReservada(estoque.getQuantidadeReservada() + 1);
+        repositorioEstoque.persist(estoque);
+
         Reserva reserva = transformeEmEntidade(reservaDTO);
         repositorioReservas.persist(reserva);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(reserva))
@@ -72,6 +110,62 @@ public class ReservaController {
         if (reserva == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        String statusAtual = reserva.getStatusReserva();
+        String novoStatus = reservaDTO.getStatusReserva();
+
+        // Retirada do livro: reservado -> emprestado
+        if ("emprestado".equals(novoStatus) && "reservado".equals(statusAtual)) {
+            Estoque estoque = repositorioEstoque.find("idLivro", reserva.getIdLivro()).firstResult();
+            if (estoque != null) {
+                estoque.setQuantidadeReservada(estoque.getQuantidadeReservada() - 1);
+                estoque.setQuantidadeEmprestada(estoque.getQuantidadeEmprestada() + 1);
+                repositorioEstoque.persist(estoque);
+            }
+        }
+
+        // Devolução: emprestado -> devolvido
+        if ("devolvido".equals(novoStatus) && "emprestado".equals(statusAtual)) {
+            Estoque estoque = repositorioEstoque.find("idLivro", reserva.getIdLivro()).firstResult();
+            if (estoque != null) {
+                estoque.setQuantidadeEmprestada(estoque.getQuantidadeEmprestada() - 1);
+                repositorioEstoque.persist(estoque);
+            }
+        }
+
+        // Cancelamento: reservado -> cancelado
+        if ("cancelado".equals(novoStatus) && "reservado".equals(statusAtual)) {
+            Estoque estoque = repositorioEstoque.find("idLivro", reserva.getIdLivro()).firstResult();
+            if (estoque != null) {
+                estoque.setQuantidadeReservada(estoque.getQuantidadeReservada() - 1);
+                repositorioEstoque.persist(estoque);
+            }
+        }
+
+        // Atraso: emprestado -> atrasado, gera multa automaticamente
+        if ("atrasado".equals(novoStatus) && "emprestado".equals(statusAtual)) {
+            // Verifica se já existe multa para essa reserva
+            Multa multaExistente = repositorioMultas.find("idReserva", reserva.getIdReserva()).firstResult();
+
+            if (multaExistente == null) {
+                // Calcula dias de atraso
+                LocalDate hoje = LocalDate.now();
+                LocalDate dataPrevista = reserva.getDataPrevistaDevolucao();
+                long diasAtraso = dataPrevista != null ? ChronoUnit.DAYS.between(dataPrevista, hoje) : 1;
+                if (diasAtraso < 1) diasAtraso = 1;
+
+                // R$ 2,00 por dia de atraso, ver de ajustar depois se necessário
+                BigDecimal valorMulta = BigDecimal.valueOf(2.00).multiply(BigDecimal.valueOf(diasAtraso));
+
+                Multa multa = new Multa();
+                multa.setIdReserva(reserva.getIdReserva());
+                multa.setValorMulta(valorMulta);
+                multa.setDataMulta(hoje);
+                multa.setStatusMulta("pendente");
+                repositorioMultas.persist(multa);
+            }
+        }
+
         reserva.setIdCliente(reservaDTO.getIdCliente());
         reserva.setIdLivro(reservaDTO.getIdLivro());
         reserva.setIdFuncionarioRetirada(reservaDTO.getIdFuncionarioRetirada());
