@@ -124,20 +124,34 @@ public class ReservaController {
             }
         }
 
-        // Devolução: emprestado -> devolvido
-        if ("devolvido".equals(novoStatus) && "emprestado".equals(statusAtual)) {
+        // Devolução: emprestado -> devolvido  OU  atrasado -> devolvido  OU  reservado -> devolvido
+        if ("devolvido".equals(novoStatus) && ("emprestado".equals(statusAtual) || "atrasado".equals(statusAtual))) {
             Estoque estoque = repositorioEstoque.find("idLivro", reserva.getIdLivro()).firstResult();
             if (estoque != null) {
-                estoque.setQuantidadeEmprestada(estoque.getQuantidadeEmprestada() - 1);
+                estoque.setQuantidadeEmprestada(Math.max(0, estoque.getQuantidadeEmprestada() - 1));
+                repositorioEstoque.persist(estoque);
+            }
+        }
+        if ("devolvido".equals(novoStatus) && "reservado".equals(statusAtual)) {
+            Estoque estoque = repositorioEstoque.find("idLivro", reserva.getIdLivro()).firstResult();
+            if (estoque != null) {
+                estoque.setQuantidadeReservada(Math.max(0, estoque.getQuantidadeReservada() - 1));
                 repositorioEstoque.persist(estoque);
             }
         }
 
-        // Cancelamento: reservado -> cancelado
+        // Cancelamento: reservado -> cancelado  OU  atrasado -> cancelado
         if ("cancelado".equals(novoStatus) && "reservado".equals(statusAtual)) {
             Estoque estoque = repositorioEstoque.find("idLivro", reserva.getIdLivro()).firstResult();
             if (estoque != null) {
-                estoque.setQuantidadeReservada(estoque.getQuantidadeReservada() - 1);
+                estoque.setQuantidadeReservada(Math.max(0, estoque.getQuantidadeReservada() - 1));
+                repositorioEstoque.persist(estoque);
+            }
+        }
+        if ("cancelado".equals(novoStatus) && ("emprestado".equals(statusAtual) || "atrasado".equals(statusAtual))) {
+            Estoque estoque = repositorioEstoque.find("idLivro", reserva.getIdLivro()).firstResult();
+            if (estoque != null) {
+                estoque.setQuantidadeEmprestada(Math.max(0, estoque.getQuantidadeEmprestada() - 1));
                 repositorioEstoque.persist(estoque);
             }
         }

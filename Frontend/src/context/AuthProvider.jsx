@@ -1,82 +1,70 @@
-import { useState, useEffect } from "react"
-import { AuthContext } from "./AuthContext"
+import { useState, useEffect } from "react";
+import { AuthContext } from "./AuthContext";
+import { login, loginFuncionario } from "../services/authService";
 
 export function AuthProvider({ children }) {
+  const STORAGE_KEY = "biblioteca-user";
+  const TOKEN_KEY = "biblioteca-token";
 
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     function rehydrateSession() {
-
-      const token = localStorage.getItem("token")
-
-      if (!token) {
-        setLoading(false)
-        return
+      const rawUser = localStorage.getItem(STORAGE_KEY);
+      if (!rawUser) {
+        setLoading(false);
+        return;
       }
 
-      // Simulação de validação de token
-      let restoredUser = null
-
-      if (token === "token-admin-123") {
-        restoredUser = {
-          name: "Administrador",
-          role: "ADMIN"
-        }
+      try {
+        const parsedUser = JSON.parse(rawUser);
+        setUser(parsedUser);
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(TOKEN_KEY);
       }
 
-      if (token === "token-user-123") {
-        restoredUser = {
-          name: "Usuário",
-          role: "USER"
-        }
-      }
-
-      setUser(restoredUser)
-      setLoading(false)
+      setLoading(false);
     }
 
-    rehydrateSession()
+    rehydrateSession();
+  }, []);
 
-  }, [])
-
-  async function handleLogin(email, password) {
-
-    if (email === "admin@email.com" && password === "123") {
-
-      const token = "token-admin-123"
-      localStorage.setItem("token", token)
-
-      setUser({
-        name: "Administrador",
-        role: "ADMIN"
-      })
-
-    } else if (email === "user@email.com" && password === "123") {
-
-      const token = "token-user-123"
-      localStorage.setItem("token", token)
-
-      setUser({
-        name: "Usuário",
-        role: "USER"
-      })
-
+  async function handleLogin(email, password, type) {
+    let currentUser;
+    if (type === "funcionario") {
+      const funcionario = await loginFuncionario(email, password);
+      currentUser = {
+        id: funcionario.idFuncionario,
+        name: funcionario.nome,
+        email: funcionario.email,
+        role: "ADMIN",
+        raw: funcionario,
+      };
     } else {
-      throw new Error("Email ou senha inválidos")
+      const cliente = await login(email, password);
+      currentUser = {
+        id: cliente.idCliente,
+        name: cliente.nomeCliente,
+        email: cliente.email,
+        role: "USER",
+        raw: cliente,
+      };
     }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+    setUser(currentUser);
   }
 
   function logout() {
-    localStorage.removeItem("token")
-    setUser(null)
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    setUser(null);
   }
 
   return (
     <AuthContext.Provider value={{ user, handleLogin, logout, loading }}>
       {children}
     </AuthContext.Provider>
-  )
+  );
 }

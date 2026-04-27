@@ -1,5 +1,6 @@
 package biblioteca.livro_genero.data;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,7 +8,10 @@ import java.util.Objects;
 @Embeddable
 public class LivroGeneroId implements Serializable {
 
+    @Column(name = "id_livro")
     private Integer idLivro;
+
+    @Column(name = "id_genero")
     private Integer idGenero;
 
     public LivroGeneroId() {}

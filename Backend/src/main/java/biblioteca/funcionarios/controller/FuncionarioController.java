@@ -9,6 +9,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
 
 @Path("/funcionarios")
 @Produces(MediaType.APPLICATION_JSON)
@@ -46,6 +47,32 @@ public class FuncionarioController {
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(funcionario))
                 .build();
+    }
+
+    @POST
+    @Path("/login")
+    @Transactional
+    public Response login(Map<String, String> credenciais) {
+        String email = credenciais.get("email");
+        String senha = credenciais.get("senha");
+
+        Funcionario funcionario = repositorioFuncionarios.find("email", email).firstResult();
+
+        if (funcionario == null) {
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity("Funcionário não encontrado.")
+                    .build();
+        }
+
+        if (!senha.equals(funcionario.getSenha())) {
+            return Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .entity("Senha incorreta.")
+                    .build();
+        }
+
+        return Response.ok(transformeEmDto(funcionario)).build();
     }
 
     @PUT

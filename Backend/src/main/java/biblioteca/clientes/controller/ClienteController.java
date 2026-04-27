@@ -9,6 +9,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
 
 @Path("/clientes")
 @Produces(MediaType.APPLICATION_JSON)
@@ -46,6 +47,59 @@ public class ClienteController {
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(cliente))
                 .build();
+    }
+
+    @POST
+    @Path("/login")
+    @Transactional
+    public Response login(Map<String, String> credenciais) {
+        String email = credenciais.get("email");
+        String senha = credenciais.get("senha");
+
+        Cliente cliente = repositorioClientes.find("email", email).firstResult();
+
+        if (cliente == null) {
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity("Cliente não encontrado.")
+                    .build();
+        }
+
+        // Verifica se está bloqueado
+        if (Boolean.TRUE.equals(cliente.getBloqueado())) {
+            return Response
+                    .status(Response.Status.FORBIDDEN)
+                    .entity("Cliente bloqueado por excesso de tentativas de login.")
+                    .build();
+        }
+
+        // Verifica a senha
+        if (!senha.equals(cliente.getSenhaCliente())) {
+            int tentativas = cliente.getTentativasLogin() + 1;
+            cliente.setTentativasLogin(tentativas);
+
+            // Bloqueia após 5 tentativas
+            if (tentativas >= 5) {
+                cliente.setBloqueado(true);
+                repositorioClientes.persist(cliente);
+                return Response
+                        .status(Response.Status.FORBIDDEN)
+                        .entity("Cliente bloqueado após 5 tentativas de login.")
+                        .build();
+            }
+
+            repositorioClientes.persist(cliente);
+            return Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .entity("Senha incorreta. Tentativas: " + tentativas + "/5")
+                    .build();
+        }
+
+        // Login com sucessi zera as tentativas
+        cliente.setTentativasLogin(0);
+        repositorioClientes.persist(cliente);
+
+        return Response.ok(transformeEmDto(cliente)).build();
     }
 
     @PUT

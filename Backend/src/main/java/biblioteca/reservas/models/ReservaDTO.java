@@ -15,7 +15,7 @@ public class ReservaDTO {
     private LocalDate dataPrevistaDevolucao;
     private LocalDate dataDevolucao;
     private String statusReserva;
-    private Integer codigoReserva;
+    private String codigoReserva;
 
     public Integer getIdReserva() {
         return idReserva;
@@ -93,10 +93,10 @@ public class ReservaDTO {
         this.statusReserva = statusReserva;
     }
 
-    public Integer getCodigoReserva() {
+    public String getCodigoReserva() {
         return codigoReserva;
     }
-    public void setCodigoReserva(Integer codigoReserva) {
+    public void setCodigoReserva(String codigoReserva) {
         this.codigoReserva = codigoReserva;
     }
 }

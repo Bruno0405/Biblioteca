@@ -1,50 +1,112 @@
-import { useState, useContext } from "react"
-import { AuthContext } from "../context/AuthContext"
-import { useNavigate } from "react-router-dom"
+import { useState, useContext } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faUserTie } from "@fortawesome/free-solid-svg-icons";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const { handleLogin } = useContext(AuthContext)
-  const navigate = useNavigate()
+  const { handleLogin } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [loginType, setLoginType] = useState("cliente");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   async function submit(e) {
-    e.preventDefault()
+    e.preventDefault();
+    setError("");
+    setSubmitting(true);
     try {
-      await handleLogin(email, password)
-      navigate("/dashboard")
+      await handleLogin(email, password, loginType);
+      navigate(loginType === "funcionario" ? "/admin" : "/dashboard");
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
     }
   }
 
+  function switchType(type) {
+    setLoginType(type);
+    setError("");
+    setEmail("");
+    setPassword("");
+  }
+
+  const isAdmin = loginType === "funcionario";
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form onSubmit={submit}>
-        <h2>Login</h2>
+    <div className="login-shell">
+      <div className="login-card">
+        <p className="kicker">Sistema Biblioteca</p>
+        <h1>Bem-vindo</h1>
+        <p className="muted" style={{ marginBottom: 20 }}>
+          Selecione o tipo de acesso para continuar.
+        </p>
 
-        {error && <p>{error}</p>}
+        <div className="login-tabs">
+          <button
+            type="button"
+            className={"login-tab" + (!isAdmin ? " active" : "")}
+            onClick={() => switchType("cliente")}
+          >
+            <FontAwesomeIcon icon={faUser} />
+            <span>Sou Cliente</span>
+          </button>
+          <button
+            type="button"
+            className={"login-tab" + (isAdmin ? " active" : "")}
+            onClick={() => switchType("funcionario")}
+          >
+            <FontAwesomeIcon icon={faUserTie} />
+            <span>Sou Funcionário</span>
+          </button>
+        </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <form onSubmit={submit} className="form-grid">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder={isAdmin ? "funcionario@biblioteca.com" : "cliente@biblioteca.com"}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Senha"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <label htmlFor="password">Senha</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+          />
 
-        <button type="submit">
-          Entrar
-        </button>
-      </form>
+          {error && <p className="form-error">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className={isAdmin ? "admin-login-btn" : ""}
+          >
+            {submitting
+              ? "Entrando..."
+              : "Entrar como " + (isAdmin ? "Funcionário" : "Cliente")}
+          </button>
+        </form>
+
+        <p className="form-help">
+          {isAdmin
+            ? "Funcionários: POST /funcionarios/login. Teste: admin@biblioteca.com / 123."
+            : "Clientes: POST /clientes/login. Testes: cliente@biblioteca.com / 123 ou maria@biblioteca.com / 123."}
+        </p>
+      </div>
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;

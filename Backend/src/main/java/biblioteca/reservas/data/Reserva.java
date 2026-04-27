@@ -44,7 +44,7 @@ public class Reserva extends PanacheEntityBase {
     private String statusReserva;
 
     @Column(name = "codigo_reserva")
-    private Integer codigoReserva;
+    private String codigoReserva;
 
     public Integer getIdReserva() {
         return idReserva;
@@ -123,10 +123,10 @@ public class Reserva extends PanacheEntityBase {
         this.statusReserva = statusReserva;
     }
 
-    public Integer getCodigoReserva() {
+    public String getCodigoReserva() {
         return codigoReserva;
     }
-    public void setCodigoReserva(Integer codigoReserva) {
+    public void setCodigoReserva(String codigoReserva) {
         this.codigoReserva = codigoReserva;
     }
 }
