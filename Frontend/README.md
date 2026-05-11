@@ -11,15 +11,24 @@ Client-facing and administrative SPA for the Biblioteca library management syste
 
 ## Technologies
 
-| Layer        | Stack |
-| ------------ | ----- |
-| Framework    | React 19 |
-| Build tool   | Vite 7 |
-| Styling      | Tailwind CSS 4 |
-| Routing      | React Router 7 |
-| HTTP client  | Axios |
-| Icons        | FontAwesome 7 |
-| Linting      | ESLint 9 |
+### Core
+
+| | |
+|---|---|
+| **Framework** | React 19 |
+| **Build tool** | Vite 7 |
+| **Language** | JavaScript (ES Modules) |
+| **Styling** | Tailwind CSS 4 |
+| **Routing** | React Router 7 |
+
+### Dependencies
+
+| | |
+|---|---|
+| **HTTP client** | Axios |
+| **Icons** | FontAwesome 7 (free-solid + SVG core) |
+| **Linting** | ESLint 9 |
+| **Type support** | TypeScript declarations (via `@types/react`) |
 
 ---
 

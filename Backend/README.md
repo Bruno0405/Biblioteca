@@ -11,17 +11,26 @@ REST API for a library management system, built with **Quarkus** and **Java 21**
 
 ## Technologies
 
-| Layer      | Stack |
-| ---------- | ----- |
-| Framework  | Quarkus 3.32 + REST (JAX-RS) |
-| Language   | Java 21 |
-| ORM        | Hibernate ORM with Panache |
-| Database   | PostgreSQL |
-| Migration  | Flyway |
-| Validation | Hibernate Validator (Bean Validation) |
-| Docs       | OpenAPI / Swagger (SmallRye) |
-| Health     | SmallRye Health |
-| Build      | Maven |
+### Core
+
+| | |
+|---|---|
+| **Runtime** | Quarkus 3.32 |
+| **Language** | Java 21 |
+| **Framework** | REST (JAX-RS) + Hibernate ORM with Panache |
+| **Build tool** | Maven (with Maven Wrapper) |
+| **Database** | PostgreSQL |
+
+### Extensions
+
+| | |
+|---|---|
+| **Migrations** | Flyway |
+| **Validation** | Hibernate Validator (Bean Validation) |
+| **API docs** | SmallRye OpenAPI / Swagger UI |
+| **Health** | SmallRye Health (liveness + readiness) |
+| **HTTP client** | REST Client + REST Client Jackson |
+| **JSON** | REST Jackson |
 
 ---
 
