@@ -1,19 +1,16 @@
-INSERT INTO Funcionarios (id_funcionario, nome, email, senha, perfil)
-SELECT COALESCE(MAX(id_funcionario), 0) + 1, 'Administrador Teste', 'admin@biblioteca.com', '123', 'A'
-FROM Funcionarios
+INSERT INTO Funcionarios (nome, email, senha, perfil)
+SELECT 'Administrador Teste', 'admin@biblioteca.com', '123', 'A'
 WHERE NOT EXISTS (
     SELECT 1 FROM Funcionarios WHERE email = 'admin@biblioteca.com'
 );
 
-INSERT INTO Funcionarios (id_funcionario, nome, email, senha, perfil)
-SELECT COALESCE(MAX(id_funcionario), 0) + 1, 'Atendente Teste', 'atendente@biblioteca.com', '123', 'U'
-FROM Funcionarios
+INSERT INTO Funcionarios (nome, email, senha, perfil)
+SELECT 'Atendente Teste', 'atendente@biblioteca.com', '123', 'U'
 WHERE NOT EXISTS (
     SELECT 1 FROM Funcionarios WHERE email = 'atendente@biblioteca.com'
 );
 
 INSERT INTO Clientes (
-    id_cliente,
     nome_cliente,
     senha_cliente,
     cpf,
@@ -26,7 +23,6 @@ INSERT INTO Clientes (
     email_confirmado
 )
 SELECT
-    COALESCE(MAX(id_cliente), 0) + 1,
     'Cliente Teste',
     '123',
     '12345678901',
@@ -37,13 +33,11 @@ SELECT
     FALSE,
     0,
     TRUE
-FROM Clientes
 WHERE NOT EXISTS (
     SELECT 1 FROM Clientes WHERE email = 'cliente@biblioteca.com'
 );
 
 INSERT INTO Clientes (
-    id_cliente,
     nome_cliente,
     senha_cliente,
     cpf,
@@ -56,7 +50,6 @@ INSERT INTO Clientes (
     email_confirmado
 )
 SELECT
-    COALESCE(MAX(id_cliente), 0) + 1,
     'Maria Leitora',
     '123',
     '98765432100',
@@ -67,7 +60,6 @@ SELECT
     FALSE,
     0,
     TRUE
-FROM Clientes
 WHERE NOT EXISTS (
     SELECT 1 FROM Clientes WHERE email = 'maria@biblioteca.com'
 );
