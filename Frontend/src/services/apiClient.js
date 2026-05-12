@@ -8,6 +8,7 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
+  if (config.url === "/auth/login") return config;
   const token = localStorage.getItem("biblioteca-token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

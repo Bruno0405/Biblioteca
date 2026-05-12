@@ -172,7 +172,8 @@ function ResourcePanel({ resource }) {
 			setModalOpen(false);
 			await carregarDados();
 		} catch (e) {
-			setError(e.response?.data || "Erro ao salvar. Verifique os dados.");
+			const errMsg = e.response?.data;
+		setError(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg) || "Erro ao salvar. Verifique os dados.");
 		} finally {
 			setSaving(false);
 		}
@@ -186,13 +187,14 @@ function ResourcePanel({ resource }) {
 			setConfirmDeleteKey(null);
 			await carregarDados();
 		} catch (e) {
-			setError(e.response?.data || "Erro ao excluir.");
+			const errMsg = e.response?.data;
+			setError(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg) || "Erro ao excluir.");
 		}
 	}
 
 	const tableColumns = useMemo(() => {
 		const seen = new Set(resource.idFields);
-		const idCols = resource.idFields.map((f) => ({ name: f, label: f }));
+		const idCols = resource.idFields.map((f) => ({ name: f, label: "ID" }));
 		const fieldCols = resource.fields
 			.filter((f) => !f.createOnly && !seen.has(f.name))
 			.map((f) => ({ name: f.name, label: f.label }));
@@ -306,7 +308,34 @@ function ResourcePanel({ resource }) {
 		);
 	}
 
+	function formatCPF(val) {
+		if (!val) return val;
+		const d = String(val).replace(/\D/g, "");
+		if (d.length !== 11) return val;
+		return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`;
+	}
+
+	function formatPhone(val) {
+		if (!val) return val;
+		const d = String(val).replace(/\D/g, "");
+		if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7, 11)}`;
+		if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6, 10)}`;
+		return val;
+	}
+
+	function formatISBN(val) {
+		if (!val) return val;
+		const d = String(val).replace(/\D/g, "");
+		if (d.length !== 13) return val;
+		return `${d.slice(0, 3)}-${d.slice(3, 4)}-${d.slice(4, 6)}-${d.slice(6, 12)}-${d.slice(12, 13)}`;
+	}
+
 	function resolveCellValue(col, rawValue) {
+		// ID columns: add # prefix
+		if (resource.idFields.includes(col.name)) {
+			return rawValue != null && rawValue !== "" ? `#${rawValue}` : "-";
+		}
+
 		const field = resource.fields.find((f) => f.name === col.name);
 		if (!field) return truncate(rawValue);
 
@@ -328,6 +357,22 @@ function ResourcePanel({ resource }) {
 			const options = lookupData[field.lookup.resource] || [];
 			const found = options.find((o) => String(o[idField]) === String(rawValue));
 			return found ? (found[field.lookup.labelField] || truncate(rawValue)) : truncate(rawValue);
+		}
+
+		// Formatação de campos conhecidos
+		if (col.name === "cpf" && rawValue) return formatCPF(rawValue);
+		if (col.name === "telefone" && rawValue) return formatPhone(rawValue);
+		if (col.name === "isnb" && rawValue) return formatISBN(rawValue);
+
+		// Boolean: ícones
+		if (field.type === "boolean") {
+			if (rawValue === true || rawValue === "true") {
+				return <FontAwesomeIcon icon={faCheck} style={{ color: "var(--success)" }} />;
+			}
+			if (rawValue === false || rawValue === "false") {
+				return <FontAwesomeIcon icon={faXmark} style={{ color: "var(--danger)" }} />;
+			}
+			return "-";
 		}
 
 		return truncate(rawValue);
@@ -502,7 +547,7 @@ function AdminDashboard() {
 						<span>Administração</span>
 					</div>
 
-					<nav style={{ overflowY: "auto" }}>
+					<nav>
 						{SIDEBAR_GROUPS.map((group) => (
 							<div key={group.label}>
 								<p className="sidebar-group-label">{group.label}</p>

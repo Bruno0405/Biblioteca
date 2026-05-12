@@ -9,10 +9,6 @@ import io.quarkus.elytron.security.common.BcryptUtil;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.wildfly.security.password.PasswordFactory;
-import org.wildfly.security.password.interfaces.BCryptPassword;
-import org.wildfly.security.password.util.ModularCrypt;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -77,7 +73,7 @@ public class TokenService {
                 .groups(new HashSet<>(Set.of(group)))
                 .claim("userId", userId)
                 .claim("userType", userType)
-                .claim("perfil", perfil)
+                .claim("perfil", perfil != null ? perfil : "")
                 .sign();
     }
 
@@ -91,13 +87,7 @@ public class TokenService {
     }
 
     private boolean verifyPassword(String plain, String storedHash) {
-        try {
-            PasswordFactory factory = PasswordFactory.getInstance(BCryptPassword.ALGORITHM_BCRYPT);
-            BCryptPassword entry = (BCryptPassword) ModularCrypt.decode(storedHash);
-            return factory.verify(entry, plain.toCharArray());
-        } catch (Exception e) {
-            return false;
-        }
+        return BcryptUtil.matches(plain, storedHash);
     }
 
     public static String hashPassword(String plain) {

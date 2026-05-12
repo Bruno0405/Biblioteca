@@ -28,7 +28,7 @@ public class EstoqueController {
     LogService logService;
 
     @GET
-    @RolesAllowed({"funcionario", "gerente", "admin"})
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     public Response listarTodos(
             @QueryParam("idLivro") Integer idLivro,
             @QueryParam("disponivel") Boolean disponivel) {
@@ -51,7 +51,7 @@ public class EstoqueController {
 
     @GET
     @Path("/{id}")
-    @RolesAllowed({"funcionario", "gerente", "admin"})
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     public Response buscarPorId(@PathParam("id") Integer id) {
         Estoque estoque = repositorioEstoque.findById(id);
         if (estoque == null) {
