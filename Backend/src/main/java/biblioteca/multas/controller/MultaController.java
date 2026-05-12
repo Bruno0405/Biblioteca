@@ -3,6 +3,8 @@ package biblioteca.multas.controller;
 import biblioteca.multas.data.Multa;
 import biblioteca.multas.models.MultaDTO;
 import biblioteca.multas.repository.RepositorioMultas;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -18,6 +20,9 @@ public class MultaController {
 
     @Inject
     RepositorioMultas repositorioMultas;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos(
@@ -55,6 +60,11 @@ public class MultaController {
     public Response criar(MultaDTO multaDTO) {
         Multa multa = transformeEmEntidade(multaDTO);
         repositorioMultas.persist(multa);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou multa");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(multa))
@@ -75,6 +85,11 @@ public class MultaController {
         multa.setStatusMulta(multaDTO.getStatusMulta());
         multa.setDataPagamento(multaDTO.getDataPagamento());
         repositorioMultas.persist(multa);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou multa (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(multa)).build();
     }
 
@@ -86,6 +101,11 @@ public class MultaController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu multa (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

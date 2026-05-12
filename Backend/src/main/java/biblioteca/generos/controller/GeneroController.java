@@ -4,6 +4,8 @@ import biblioteca.generos.data.Genero;
 import biblioteca.generos.models.GeneroDTO;
 import biblioteca.generos.repository.RepositorioGeneros;
 import biblioteca.livros.models.LivroDTO;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -18,6 +20,9 @@ public class GeneroController {
 
     @Inject
     RepositorioGeneros repositorioGeneros;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos() {
@@ -43,6 +48,11 @@ public class GeneroController {
     public Response criar(GeneroDTO generoDTO) {
         Genero genero = transformeEmEntidade(generoDTO);
         repositorioGeneros.persist(genero);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou genero");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(genero))
@@ -59,6 +69,11 @@ public class GeneroController {
         }
         genero.setNomeGenero(generoDTO.getNomeGenero());
         repositorioGeneros.persist(genero);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou genero (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(genero)).build();
     }
 
@@ -83,6 +98,11 @@ public class GeneroController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu genero (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

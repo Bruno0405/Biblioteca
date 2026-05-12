@@ -3,6 +3,8 @@ package biblioteca.funcionarios.controller;
 import biblioteca.funcionarios.data.Funcionario;
 import biblioteca.funcionarios.models.FuncionarioDTO;
 import biblioteca.funcionarios.repository.RepositorioFuncionarios;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -18,6 +20,9 @@ public class FuncionarioController {
 
     @Inject
     RepositorioFuncionarios repositorioFuncionarios;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos() {
@@ -43,6 +48,11 @@ public class FuncionarioController {
     public Response criar(FuncionarioDTO funcionarioDTO) {
         Funcionario funcionario = transformeEmEntidade(funcionarioDTO);
         repositorioFuncionarios.persist(funcionario);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou funcionario");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(funcionario))
@@ -87,6 +97,11 @@ public class FuncionarioController {
         funcionario.setEmail(funcionarioDTO.getEmail());
         funcionario.setPerfil(funcionarioDTO.getPerfil());
         repositorioFuncionarios.persist(funcionario);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou funcionario (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(funcionario)).build();
     }
 
@@ -98,6 +113,11 @@ public class FuncionarioController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu funcionario (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

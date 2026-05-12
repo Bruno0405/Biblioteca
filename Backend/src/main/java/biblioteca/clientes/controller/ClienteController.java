@@ -3,6 +3,8 @@ package biblioteca.clientes.controller;
 import biblioteca.clientes.data.Cliente;
 import biblioteca.clientes.models.ClienteDTO;
 import biblioteca.clientes.repository.RepositorioClientes;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -18,6 +20,9 @@ public class ClienteController {
 
     @Inject
     RepositorioClientes repositorioClientes;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos() {
@@ -43,6 +48,11 @@ public class ClienteController {
     public Response criar(ClienteDTO clienteDTO) {
         Cliente cliente = transformeEmEntidade(clienteDTO);
         repositorioClientes.persist(cliente);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou cliente");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(cliente))
@@ -82,6 +92,11 @@ public class ClienteController {
             if (tentativas >= 5) {
                 cliente.setBloqueado(true);
                 repositorioClientes.persist(cliente);
+
+                Log logEntry = new Log();
+                logEntry.setAcao("Cliente bloqueado (id: " + cliente.getIdCliente() + ")");
+                logService.log(logEntry);
+
                 return Response
                         .status(Response.Status.FORBIDDEN)
                         .entity("Cliente bloqueado após 5 tentativas de login.")
@@ -89,6 +104,11 @@ public class ClienteController {
             }
 
             repositorioClientes.persist(cliente);
+
+            Log logEntry = new Log();
+            logEntry.setAcao("Tentativa de login falhou (cliente id: " + cliente.getIdCliente() + ")");
+            logService.log(logEntry);
+
             return Response
                     .status(Response.Status.UNAUTHORIZED)
                     .entity("Senha incorreta. Tentativas: " + tentativas + "/5")
@@ -98,6 +118,10 @@ public class ClienteController {
         // Login com sucessi zera as tentativas
         cliente.setTentativasLogin(0);
         repositorioClientes.persist(cliente);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Login de cliente (id: " + cliente.getIdCliente() + ")");
+        logService.log(logEntry);
 
         return Response.ok(transformeEmDto(cliente)).build();
     }
@@ -120,6 +144,11 @@ public class ClienteController {
         cliente.setTentativasLogin(clienteDTO.getTentativasLogin());
         cliente.setEmailConfirmado(clienteDTO.getEmailConfirmado());
         repositorioClientes.persist(cliente);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou cliente (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(cliente)).build();
     }
 
@@ -131,6 +160,11 @@ public class ClienteController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu cliente (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

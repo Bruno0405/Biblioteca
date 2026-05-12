@@ -9,6 +9,8 @@ import biblioteca.generos.repository.RepositorioGeneros;
 import biblioteca.livros.data.Livro;
 import biblioteca.livros.models.LivroDTO;
 import biblioteca.livros.repository.RepositorioLivros;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -40,6 +42,9 @@ public class LivroController {
 
     @Inject
     RepositorioGeneros repositorioGeneros;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos(@QueryParam("nome") String nome,
@@ -100,6 +105,10 @@ public class LivroController {
 
         repositorioLivros.persist(livro);
 
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou livro");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(tranformeEmDto(livro))
@@ -137,6 +146,10 @@ public class LivroController {
 
         repositorioLivros.persist(livro);
 
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou livro (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response
                 .ok(tranformeEmDto(livro))
                 .build();
@@ -166,6 +179,11 @@ public class LivroController {
         List<Autor> autores = repositorioAutores.list("idAutor IN ?1", idAutores);
         livro.getAutores().addAll(autores);
         repositorioLivros.persist(livro);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Adicionou autor(es) ao livro (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(tranformeEmDto(livro)).build();
     }
 
@@ -179,6 +197,11 @@ public class LivroController {
         }
         livro.getAutores().removeIf(a -> a.getIdAutor().equals(idAutor));
         repositorioLivros.persist(livro);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu autor do livro (livro id: " + id + ", autor id: " + idAutor + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 
@@ -206,6 +229,11 @@ public class LivroController {
         List<Genero> generos = repositorioGeneros.list("idGenero IN ?1", idGeneros);
         livro.getGeneros().addAll(generos);
         repositorioLivros.persist(livro);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Adicionou genero(s) ao livro (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(tranformeEmDto(livro)).build();
     }
 
@@ -219,6 +247,11 @@ public class LivroController {
         }
         livro.getGeneros().removeIf(g -> g.getIdGenero().equals(idGenero));
         repositorioLivros.persist(livro);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu genero do livro (livro id: " + id + ", genero id: " + idGenero + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 
@@ -233,6 +266,10 @@ public class LivroController {
                     .status(Response.Status.NOT_FOUND)
                     .build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu livro (id: " + id + ")");
+        logService.log(logEntry);
 
         return Response
                 .noContent()

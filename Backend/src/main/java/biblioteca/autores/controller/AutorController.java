@@ -4,6 +4,8 @@ import biblioteca.autores.data.Autor;
 import biblioteca.autores.models.AutorDTO;
 import biblioteca.autores.repository.RepositorioAutores;
 import biblioteca.livros.models.LivroDTO;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -18,6 +20,9 @@ public class AutorController {
 
     @Inject
     RepositorioAutores repositorioAutores;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos() {
@@ -43,6 +48,11 @@ public class AutorController {
     public Response criar(AutorDTO autorDTO) {
         Autor autor = transformeEmEntidade(autorDTO);
         repositorioAutores.persist(autor);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou autor");
+        logService.log(logEntry);
+
         return Response.status(Response.Status.CREATED)
                 .entity(transformeEmDto(autor))
                 .build();
@@ -58,6 +68,11 @@ public class AutorController {
         }
         autor.setNomeAutor(autorDTO.getNomeAutor());
         repositorioAutores.persist(autor);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou autor (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(autor)).build();
     }
 
@@ -82,6 +97,11 @@ public class AutorController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu autor (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

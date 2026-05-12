@@ -3,6 +3,8 @@ package biblioteca.fotos.controller;
 import biblioteca.fotos.data.Foto;
 import biblioteca.fotos.models.FotoDTO;
 import biblioteca.fotos.repository.RepositorioFotos;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -17,6 +19,9 @@ public class FotoController {
 
     @Inject
     RepositorioFotos repositorioFotos;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos() {
@@ -42,6 +47,11 @@ public class FotoController {
     public Response criar(FotoDTO fotoDTO) {
         Foto foto = transformeEmEntidade(fotoDTO);
         repositorioFotos.persist(foto);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou foto");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(foto))
@@ -59,6 +69,11 @@ public class FotoController {
         foto.setIdLivro(fotoDTO.getIdLivro());
         foto.setFoto(fotoDTO.getFoto());
         repositorioFotos.persist(foto);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou foto (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(foto)).build();
     }
 
@@ -70,6 +85,11 @@ public class FotoController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu foto (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

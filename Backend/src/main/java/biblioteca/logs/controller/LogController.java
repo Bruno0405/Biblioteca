@@ -43,6 +43,13 @@ public class LogController {
     public Response criar(LogDTO logDTO) {
         Log log = transformeEmEntidade(logDTO);
         repositorioLogs.persist(log);
+
+        // Log the log creation directly via repository to avoid recursion with LogService
+        Log logLog = new Log();
+        logLog.setAcao("Criou log");
+        logLog.setDataAcao(LocalDateTime.now());
+        repositorioLogs.persist(logLog);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(log))
@@ -57,6 +64,13 @@ public class LogController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        // Log the deletion directly via repository to avoid recursion with LogService
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu log (id: " + id + ")");
+        logEntry.setDataAcao(LocalDateTime.now());
+        repositorioLogs.persist(logEntry);
+
         return Response.noContent().build();
     }
 

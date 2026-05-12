@@ -3,6 +3,8 @@ package biblioteca.estoque.controller;
 import biblioteca.estoque.data.Estoque;
 import biblioteca.estoque.models.EstoqueDTO;
 import biblioteca.estoque.repository.RepositorioEstoque;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -18,6 +20,9 @@ public class EstoqueController {
 
     @Inject
     RepositorioEstoque repositorioEstoque;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos(
@@ -55,6 +60,11 @@ public class EstoqueController {
     public Response criar(EstoqueDTO estoqueDTO) {
         Estoque estoque = transformeEmEntidade(estoqueDTO);
         repositorioEstoque.persist(estoque);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou estoque");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(estoque))
@@ -76,6 +86,11 @@ public class EstoqueController {
         estoque.setQuantidadeDanificada(estoqueDTO.getQuantidadeDanificada());
         estoque.setEstoqueMinimo(estoqueDTO.getEstoqueMinimo());
         repositorioEstoque.persist(estoque);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou estoque (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(estoque)).build();
     }
 
@@ -87,6 +102,11 @@ public class EstoqueController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu estoque (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

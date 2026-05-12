@@ -2,6 +2,8 @@ package biblioteca.reservas.controller;
 
 import biblioteca.estoque.data.Estoque;
 import biblioteca.estoque.repository.RepositorioEstoque;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import biblioteca.multas.data.Multa;
 import biblioteca.multas.repository.RepositorioMultas;
 import biblioteca.reservas.data.Reserva;
@@ -31,6 +33,9 @@ public class ReservaController {
 
     @Inject
     RepositorioMultas repositorioMultas;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos(
@@ -95,6 +100,10 @@ public class ReservaController {
 
         Reserva reserva = transformeEmEntidade(reservaDTO);
         repositorioReservas.persist(reserva);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou reserva");
+        logService.log(logEntry);
 
         return Response
                 .status(Response.Status.CREATED)
@@ -192,6 +201,11 @@ public class ReservaController {
         reserva.setStatusReserva(reservaDTO.getStatusReserva());
         reserva.setCodigoReserva(reservaDTO.getCodigoReserva());
         repositorioReservas.persist(reserva);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou reserva (id: " + id + ") para " + novoStatus);
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(reserva)).build();
     }
 

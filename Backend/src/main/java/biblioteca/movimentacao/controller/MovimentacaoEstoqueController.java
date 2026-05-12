@@ -3,6 +3,8 @@ package biblioteca.movimentacao.controller;
 import biblioteca.movimentacao.data.MovimentacaoEstoque;
 import biblioteca.movimentacao.models.MovimentacaoEstoqueDTO;
 import biblioteca.movimentacao.repository.RepositorioMovimentacaoEstoque;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -17,6 +19,9 @@ public class MovimentacaoEstoqueController {
 
     @Inject
     RepositorioMovimentacaoEstoque repositorioMovimentacaoEstoque;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos() {
@@ -42,6 +47,11 @@ public class MovimentacaoEstoqueController {
     public Response criar(MovimentacaoEstoqueDTO movimentacaoDTO) {
         MovimentacaoEstoque movimentacao = transformeEmEntidade(movimentacaoDTO);
         repositorioMovimentacaoEstoque.persist(movimentacao);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou movimentacao");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(movimentacao))
@@ -56,6 +66,11 @@ public class MovimentacaoEstoqueController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu movimentacao (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

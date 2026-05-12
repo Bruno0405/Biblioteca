@@ -3,6 +3,8 @@ package biblioteca.historico.controller;
 import biblioteca.historico.data.HistoricoCliente;
 import biblioteca.historico.models.HistoricoClienteDTO;
 import biblioteca.historico.repository.RepositorioHistoricoCliente;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -17,6 +19,9 @@ public class HistoricoClienteController {
 
     @Inject
     RepositorioHistoricoCliente repositorioHistoricoCliente;
+
+    @Inject
+    LogService logService;
 
     @GET
     public Response listarTodos() {
@@ -42,6 +47,11 @@ public class HistoricoClienteController {
     public Response criar(HistoricoClienteDTO historicoDTO) {
         HistoricoCliente historico = transformeEmEntidade(historicoDTO);
         repositorioHistoricoCliente.persist(historico);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou historico");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(historico))
@@ -56,6 +66,11 @@ public class HistoricoClienteController {
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu historico (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 
