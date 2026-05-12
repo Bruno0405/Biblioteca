@@ -1,5 +1,2 @@
 # Playwright MCP server.
 .playwright*
-
-# Workspace resources.
-.workspace*
