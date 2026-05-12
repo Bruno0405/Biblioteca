@@ -1,8 +1,8 @@
-package biblioteca.historico_cliente.controller;
+package biblioteca.historico.controller;
 
-import biblioteca.historico_cliente.data.HistoricoCliente;
-import biblioteca.historico_cliente.models.HistoricoClienteDTO;
-import biblioteca.historico_cliente.repository.RepositorioHistoricoCliente;
+import biblioteca.historico.data.HistoricoCliente;
+import biblioteca.historico.models.HistoricoClienteDTO;
+import biblioteca.historico.repository.RepositorioHistoricoCliente;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;

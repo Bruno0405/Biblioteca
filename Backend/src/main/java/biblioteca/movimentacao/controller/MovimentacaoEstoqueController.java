@@ -1,8 +1,8 @@
-package biblioteca.movimentacao_estoque.controller;
+package biblioteca.movimentacao.controller;
 
-import biblioteca.movimentacao_estoque.data.MovimentacaoEstoque;
-import biblioteca.movimentacao_estoque.models.MovimentacaoEstoqueDTO;
-import biblioteca.movimentacao_estoque.repository.RepositorioMovimentacaoEstoque;
+import biblioteca.movimentacao.data.MovimentacaoEstoque;
+import biblioteca.movimentacao.models.MovimentacaoEstoqueDTO;
+import biblioteca.movimentacao.repository.RepositorioMovimentacaoEstoque;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;

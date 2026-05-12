@@ -1,6 +1,6 @@
-package biblioteca.historico_cliente.repository;
+package biblioteca.historico.repository;
 
-import biblioteca.historico_cliente.data.HistoricoCliente;
+import biblioteca.historico.data.HistoricoCliente;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 

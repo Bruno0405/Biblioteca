@@ -5,7 +5,7 @@ import biblioteca.autores.data.Autor;
 import biblioteca.estoque.data.Estoque;
 import biblioteca.fotos.data.Foto;
 import biblioteca.generos.data.Genero;
-import biblioteca.movimentacao_estoque.data.MovimentacaoEstoque;
+import biblioteca.movimentacao.data.MovimentacaoEstoque;
 import biblioteca.reservas.data.Reserva;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;

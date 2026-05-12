@@ -1,6 +1,6 @@
-package biblioteca.movimentacao_estoque.repository;
+package biblioteca.movimentacao.repository;
 
-import biblioteca.movimentacao_estoque.data.MovimentacaoEstoque;
+import biblioteca.movimentacao.data.MovimentacaoEstoque;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
