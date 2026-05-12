@@ -20,7 +20,7 @@ Full-stack library management system built as a university project. The system h
                       ▼
 ┌──────────────────────────────────────────────────────────┐
 │                   Backend (Quarkus API)                   │
-│  14 domain modules  │  REST endpoints  │  Business logic │
+│  12 domain modules  │  REST endpoints  │  Business logic │
 └─────────────────────┬────────────────────────────────────┘
                       │  JDBC
                       ▼
@@ -42,11 +42,11 @@ The monorepo is organized into three directories:
 
 ## Domain Model
 
-The backend is organized around **14 domain modules** that map directly to database tables:
+The backend is organized around **12 domain modules** that map directly to database tables:
 
 ```
-Books ──┬── Authors (M:N via livro_autor)
-        ├── Genres  (M:N via livro_genero)
+Books ──┬── Authors (M:N via JPA @ManyToMany)
+        ├── Genres  (M:N via JPA @ManyToMany)
         ├── Photos  (1:N)
         ├── Stock   (1:1)
         ├── Stock Movements (1:N)
@@ -111,12 +111,10 @@ Biblioteca/
       fotos/                        # Photo CRUD
       funcionarios/                 # Employee CRUD + login
       generos/                      # Genre CRUD
-      historico_cliente/            # Client history audit
-      livro_autor/                  # Book-Author link
-      livro_genero/                 # Book-Genre link
-      livros/                       # Book CRUD + search
+      historico/                    # Client history audit
+      livros/                       # Book CRUD + search (authors & genres via JPA)
       logs/                         # System logs
-      movimentacao_estoque/         # Stock movements
+      movimentacao/                 # Stock movements
       multas/                       # Fine CRUD
       reservas/                     # Reservation CRUD + state machine
     src/main/resources/

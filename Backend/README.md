@@ -36,7 +36,7 @@ REST API for a library management system, built with **Quarkus** and **Java 21**
 
 ## Architecture
 
-The backend is organized into **14 domain modules**, each following a uniform layered structure inside `biblioteca/`:
+The backend is organized into **12 domain modules**, each following a uniform layered structure inside `biblioteca/`:
 
 ```
 biblioteca/
@@ -46,12 +46,10 @@ biblioteca/
   fotos/                 Book photos
   funcionarios/          Staff / Employees
   generos/               Genres
-  historico_cliente/     Client change history
-  livro_autor/           Book–Author many-to-many
-  livro_genero/          Book–Genre many-to-many
-  livros/                Books
+  historico/             Client change history
+  livros/                Books (embeds authors & genres via JPA)
   logs/                  System-wide audit logs
-  movimentacao_estoque/  Stock movements (entry, loss, adjustment, damaged)
+  movimentacao/          Stock movements (entry, loss, adjustment, damaged)
   multas/                Fines
   reservas/              Reservations / Loans
 ```
@@ -71,11 +69,9 @@ Every module follows four sub-packages:
 
 | Module | Description |
 | ------ | ----------- |
-| **Books** | Book catalog with name, ISBN, publisher, year, synopsis, physical location. Supports case-insensitive search by name and publisher. |
+| **Books** | Book catalog with name, ISBN, publisher, year, synopsis, physical location. Supports case-insensitive search by name and publisher. Authors and genres are managed via JPA `@ManyToMany` relationships — accepted and returned inline on book create/read/update. |
 | **Authors** | Author registry. |
 | **Genres** | Literary genres. |
-| **Book–Author** | Many-to-many join between books and authors (composite key). |
-| **Book–Genre** | Many-to-many join between books and genres (composite key). |
 | **Photos** | URL-based photo attachments for books. |
 | **Stock** | Per-book inventory with total, reserved, loaned, and damaged counters. Filterable by book and availability. |
 | **Stock Movements** | Records of entry, loss, adjustment, or damaged events tied to a book. |
@@ -160,12 +156,10 @@ Backend/
         ├── fotos/            # Photo CRUD
         ├── funcionarios/     # Employee CRUD + login
         ├── generos/          # Genre CRUD
-        ├── historico_cliente/ # Client history audit
-        ├── livro_autor/      # Book-Author link
-        ├── livro_genero/     # Book-Genre link
-        ├── livros/           # Book CRUD + search
+        ├── historico/        # Client history audit
+        ├── livros/           # Book CRUD + search (authors & genres via JPA)
         ├── logs/             # System logs
-        ├── movimentacao_estoque/ # Stock movements
+        ├── movimentacao/     # Stock movements
         ├── multas/           # Fine CRUD
         └── reservas/         # Reservation CRUD + state machine
       resources/
