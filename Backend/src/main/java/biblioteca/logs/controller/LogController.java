@@ -3,6 +3,8 @@ package biblioteca.logs.controller;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.models.LogDTO;
 import biblioteca.logs.repository.RepositorioLogs;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -14,6 +16,8 @@ import java.util.List;
 @Path("/logs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
+@RolesAllowed("admin")
 public class LogController {
 
     @Inject

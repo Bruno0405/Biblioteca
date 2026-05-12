@@ -6,6 +6,9 @@ import biblioteca.autores.repository.RepositorioAutores;
 import biblioteca.livros.models.LivroDTO;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -16,6 +19,7 @@ import java.util.List;
 @Path("/autores")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class AutorController {
 
     @Inject
@@ -25,6 +29,7 @@ public class AutorController {
     LogService logService;
 
     @GET
+    @PermitAll
     public Response listarTodos() {
         List<Autor> autores = repositorioAutores.listAll();
         List<AutorDTO> autoresDTO = autores.stream()
@@ -35,6 +40,7 @@ public class AutorController {
 
     @GET
     @Path("/{id}")
+    @PermitAll
     public Response buscarPorId(@PathParam("id") Integer id) {
         Autor autor = repositorioAutores.findById(id);
         if (autor == null) {
@@ -44,6 +50,7 @@ public class AutorController {
     }
 
     @POST
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response criar(AutorDTO autorDTO) {
         Autor autor = transformeEmEntidade(autorDTO);
@@ -60,6 +67,7 @@ public class AutorController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, AutorDTO autorDTO) {
         Autor autor = repositorioAutores.findById(id);
@@ -78,6 +86,7 @@ public class AutorController {
 
     @GET
     @Path("/{id}/livros")
+    @PermitAll
     public Response listarLivros(@PathParam("id") Integer id) {
         Autor autor = repositorioAutores.findById(id);
         if (autor == null) {
@@ -91,6 +100,7 @@ public class AutorController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioAutores.deleteById(id);

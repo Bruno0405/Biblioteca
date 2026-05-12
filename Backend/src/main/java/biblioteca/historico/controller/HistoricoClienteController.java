@@ -5,6 +5,8 @@ import biblioteca.historico.models.HistoricoClienteDTO;
 import biblioteca.historico.repository.RepositorioHistoricoCliente;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -15,6 +17,8 @@ import java.util.List;
 @Path("/historico")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
+@RolesAllowed("admin")
 public class HistoricoClienteController {
 
     @Inject

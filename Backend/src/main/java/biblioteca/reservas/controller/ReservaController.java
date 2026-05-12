@@ -9,6 +9,8 @@ import biblioteca.multas.repository.RepositorioMultas;
 import biblioteca.reservas.data.Reserva;
 import biblioteca.reservas.models.ReservaDTO;
 import biblioteca.reservas.repository.RepositorioReservas;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -19,10 +21,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 @Path("/reservas")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class ReservaController {
 
     @Inject
@@ -37,11 +41,20 @@ public class ReservaController {
     @Inject
     LogService logService;
 
+    @Inject
+    JsonWebToken jwt;
+
     @GET
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     public Response listarTodos(
             @QueryParam("idCliente") Integer idCliente,
             @QueryParam("idLivro") Integer idLivro,
             @QueryParam("status") String status) {
+
+        String userType = jwt.getClaim("userType");
+        if ("cliente".equals(userType)) {
+            idCliente = Integer.valueOf(jwt.getClaim("userId").toString());
+        }
 
         List<Reserva> reservas;
 
@@ -63,6 +76,7 @@ public class ReservaController {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     public Response buscarPorId(@PathParam("id") Integer id) {
         Reserva reserva = repositorioReservas.findById(id);
         if (reserva == null) {
@@ -72,6 +86,7 @@ public class ReservaController {
     }
 
     @POST
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     @Transactional
     public Response criar(ReservaDTO reservaDTO) {
         Estoque estoque = repositorioEstoque.find("idLivro", reservaDTO.getIdLivro()).firstResult();
@@ -113,6 +128,7 @@ public class ReservaController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"funcionario", "gerente", "admin"})
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, ReservaDTO reservaDTO) {
         Reserva reserva = repositorioReservas.findById(id);
@@ -211,6 +227,7 @@ public class ReservaController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioReservas.deleteById(id);

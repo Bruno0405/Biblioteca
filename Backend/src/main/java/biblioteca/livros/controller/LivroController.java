@@ -11,6 +11,9 @@ import biblioteca.livros.models.LivroDTO;
 import biblioteca.livros.repository.RepositorioLivros;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -32,6 +35,7 @@ import java.util.Set;
 @Path("/livros")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class LivroController {
 
     @Inject
@@ -47,6 +51,7 @@ public class LivroController {
     LogService logService;
 
     @GET
+    @PermitAll
     public Response listarTodos(@QueryParam("nome") String nome,
                                 @QueryParam("editora") String editora,
                                 @QueryParam("ano") Integer ano) {
@@ -74,6 +79,7 @@ public class LivroController {
 
     @GET
     @Path("/{id}")
+    @PermitAll
     public Response buscarPorId(@PathParam("id") Integer id) {
         Livro livro = repositorioLivros.findById(id);
 
@@ -89,6 +95,7 @@ public class LivroController {
     }
 
     @POST
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response criar(LivroDTO livroDTO) {
         Livro livro = transformeEmEntidade(livroDTO);
@@ -117,6 +124,7 @@ public class LivroController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, LivroDTO livroDTO) {
         Livro livro = repositorioLivros.findById(id);
@@ -157,6 +165,7 @@ public class LivroController {
 
     @GET
     @Path("/{id}/autores")
+    @PermitAll
     public Response listarAutores(@PathParam("id") Integer id) {
         Livro livro = repositorioLivros.findById(id);
         if (livro == null) {
@@ -170,6 +179,7 @@ public class LivroController {
 
     @POST
     @Path("/{id}/autores")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response adicionarAutores(@PathParam("id") Integer id, Set<Integer> idAutores) {
         Livro livro = repositorioLivros.findById(id);
@@ -189,6 +199,7 @@ public class LivroController {
 
     @DELETE
     @Path("/{id}/autores/{idAutor}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response removerAutor(@PathParam("id") Integer id, @PathParam("idAutor") Integer idAutor) {
         Livro livro = repositorioLivros.findById(id);
@@ -207,6 +218,7 @@ public class LivroController {
 
     @GET
     @Path("/{id}/generos")
+    @PermitAll
     public Response listarGeneros(@PathParam("id") Integer id) {
         Livro livro = repositorioLivros.findById(id);
         if (livro == null) {
@@ -220,6 +232,7 @@ public class LivroController {
 
     @POST
     @Path("/{id}/generos")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response adicionarGeneros(@PathParam("id") Integer id, Set<Integer> idGeneros) {
         Livro livro = repositorioLivros.findById(id);
@@ -239,6 +252,7 @@ public class LivroController {
 
     @DELETE
     @Path("/{id}/generos/{idGenero}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response removerGenero(@PathParam("id") Integer id, @PathParam("idGenero") Integer idGenero) {
         Livro livro = repositorioLivros.findById(id);
@@ -257,6 +271,7 @@ public class LivroController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioLivros.deleteById(id);

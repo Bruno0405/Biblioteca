@@ -5,6 +5,8 @@ import biblioteca.estoque.models.EstoqueDTO;
 import biblioteca.estoque.repository.RepositorioEstoque;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -16,6 +18,7 @@ import java.util.List;
 @Path("/estoque")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class EstoqueController {
 
     @Inject
@@ -25,6 +28,7 @@ public class EstoqueController {
     LogService logService;
 
     @GET
+    @RolesAllowed({"funcionario", "gerente", "admin"})
     public Response listarTodos(
             @QueryParam("idLivro") Integer idLivro,
             @QueryParam("disponivel") Boolean disponivel) {
@@ -47,6 +51,7 @@ public class EstoqueController {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"funcionario", "gerente", "admin"})
     public Response buscarPorId(@PathParam("id") Integer id) {
         Estoque estoque = repositorioEstoque.findById(id);
         if (estoque == null) {
@@ -56,6 +61,7 @@ public class EstoqueController {
     }
 
     @POST
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response criar(EstoqueDTO estoqueDTO) {
         Estoque estoque = transformeEmEntidade(estoqueDTO);
@@ -73,6 +79,7 @@ public class EstoqueController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, EstoqueDTO estoqueDTO) {
         Estoque estoque = repositorioEstoque.findById(id);
@@ -96,6 +103,7 @@ public class EstoqueController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioEstoque.deleteById(id);

@@ -5,6 +5,9 @@ import biblioteca.fotos.models.FotoDTO;
 import biblioteca.fotos.repository.RepositorioFotos;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -15,6 +18,7 @@ import java.util.List;
 @Path("/fotos")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class FotoController {
 
     @Inject
@@ -24,6 +28,7 @@ public class FotoController {
     LogService logService;
 
     @GET
+    @PermitAll
     public Response listarTodos() {
         List<Foto> fotos = repositorioFotos.listAll();
         List<FotoDTO> fotosDTO = fotos.stream()
@@ -34,6 +39,7 @@ public class FotoController {
 
     @GET
     @Path("/{id}")
+    @PermitAll
     public Response buscarPorId(@PathParam("id") Integer id) {
         Foto foto = repositorioFotos.findById(id);
         if (foto == null) {
@@ -43,6 +49,7 @@ public class FotoController {
     }
 
     @POST
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response criar(FotoDTO fotoDTO) {
         Foto foto = transformeEmEntidade(fotoDTO);
@@ -60,6 +67,7 @@ public class FotoController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, FotoDTO fotoDTO) {
         Foto foto = repositorioFotos.findById(id);
@@ -79,6 +87,7 @@ public class FotoController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioFotos.deleteById(id);

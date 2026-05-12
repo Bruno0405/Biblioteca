@@ -5,6 +5,8 @@ import biblioteca.movimentacao.models.MovimentacaoEstoqueDTO;
 import biblioteca.movimentacao.repository.RepositorioMovimentacaoEstoque;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -15,6 +17,7 @@ import java.util.List;
 @Path("/movimentacao")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class MovimentacaoEstoqueController {
 
     @Inject
@@ -24,6 +27,7 @@ public class MovimentacaoEstoqueController {
     LogService logService;
 
     @GET
+    @RolesAllowed({"funcionario", "gerente", "admin"})
     public Response listarTodos() {
         List<MovimentacaoEstoque> movimentacoes = repositorioMovimentacaoEstoque.listAll();
         List<MovimentacaoEstoqueDTO> movimentacoesDTO = movimentacoes.stream()
@@ -34,6 +38,7 @@ public class MovimentacaoEstoqueController {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"funcionario", "gerente", "admin"})
     public Response buscarPorId(@PathParam("id") Integer id) {
         MovimentacaoEstoque movimentacao = repositorioMovimentacaoEstoque.findById(id);
         if (movimentacao == null) {
@@ -43,6 +48,7 @@ public class MovimentacaoEstoqueController {
     }
 
     @POST
+    @RolesAllowed({"funcionario", "gerente", "admin"})
     @Transactional
     public Response criar(MovimentacaoEstoqueDTO movimentacaoDTO) {
         MovimentacaoEstoque movimentacao = transformeEmEntidade(movimentacaoDTO);
@@ -60,6 +66,7 @@ public class MovimentacaoEstoqueController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioMovimentacaoEstoque.deleteById(id);

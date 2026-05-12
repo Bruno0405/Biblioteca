@@ -1,10 +1,14 @@
 package biblioteca.funcionarios.controller;
 
+import biblioteca.auth.TokenService;
+import biblioteca.auth.models.LoginResponse;
 import biblioteca.funcionarios.data.Funcionario;
 import biblioteca.funcionarios.models.FuncionarioDTO;
 import biblioteca.funcionarios.repository.RepositorioFuncionarios;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -24,7 +28,11 @@ public class FuncionarioController {
     @Inject
     LogService logService;
 
+    @Inject
+    TokenService tokenService;
+
     @GET
+    @RolesAllowed("admin")
     public Response listarTodos() {
         List<Funcionario> funcionarios = repositorioFuncionarios.listAll();
         List<FuncionarioDTO> funcionariosDTO = funcionarios.stream()
@@ -35,6 +43,7 @@ public class FuncionarioController {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed("admin")
     public Response buscarPorId(@PathParam("id") Integer id) {
         Funcionario funcionario = repositorioFuncionarios.findById(id);
         if (funcionario == null) {
@@ -44,9 +53,13 @@ public class FuncionarioController {
     }
 
     @POST
+    @RolesAllowed("admin")
     @Transactional
     public Response criar(FuncionarioDTO funcionarioDTO) {
         Funcionario funcionario = transformeEmEntidade(funcionarioDTO);
+        if (funcionario.getSenha() != null && !funcionario.getSenha().isEmpty()) {
+            funcionario.setSenha(TokenService.hashPassword(funcionario.getSenha()));
+        }
         repositorioFuncionarios.persist(funcionario);
 
         Log logEntry = new Log();
@@ -61,32 +74,30 @@ public class FuncionarioController {
 
     @POST
     @Path("/login")
+    @PermitAll
     @Transactional
     public Response login(Map<String, String> credenciais) {
         String email = credenciais.get("email");
         String senha = credenciais.get("senha");
 
-        Funcionario funcionario = repositorioFuncionarios.find("email", email).firstResult();
-
-        if (funcionario == null) {
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .entity("Funcionário não encontrado.")
-                    .build();
-        }
-
-        if (!senha.equals(funcionario.getSenha())) {
+        LoginResponse tokenResponse = tokenService.authenticate(email, senha, "funcionario");
+        if (tokenResponse == null) {
             return Response
                     .status(Response.Status.UNAUTHORIZED)
-                    .entity("Senha incorreta.")
+                    .entity("Credenciais inválidas.")
                     .build();
         }
 
-        return Response.ok(transformeEmDto(funcionario)).build();
+        Log logEntry = new Log();
+        logEntry.setAcao("Login de funcionario (id: " + tokenResponse.getUserId() + ")");
+        logService.log(logEntry);
+
+        return Response.ok(tokenResponse).build();
     }
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, FuncionarioDTO funcionarioDTO) {
         Funcionario funcionario = repositorioFuncionarios.findById(id);
@@ -96,6 +107,11 @@ public class FuncionarioController {
         funcionario.setNome(funcionarioDTO.getNome());
         funcionario.setEmail(funcionarioDTO.getEmail());
         funcionario.setPerfil(funcionarioDTO.getPerfil());
+
+        if (funcionarioDTO.getSenha() != null && !funcionarioDTO.getSenha().isEmpty()) {
+            funcionario.setSenha(TokenService.hashPassword(funcionarioDTO.getSenha()));
+        }
+
         repositorioFuncionarios.persist(funcionario);
 
         Log logEntry = new Log();
@@ -107,6 +123,7 @@ public class FuncionarioController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioFuncionarios.deleteById(id);

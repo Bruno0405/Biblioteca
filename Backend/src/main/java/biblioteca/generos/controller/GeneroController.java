@@ -6,6 +6,9 @@ import biblioteca.generos.repository.RepositorioGeneros;
 import biblioteca.livros.models.LivroDTO;
 import biblioteca.logs.data.Log;
 import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -16,6 +19,7 @@ import java.util.List;
 @Path("/generos")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class GeneroController {
 
     @Inject
@@ -25,6 +29,7 @@ public class GeneroController {
     LogService logService;
 
     @GET
+    @PermitAll
     public Response listarTodos() {
         List<Genero> generos = repositorioGeneros.listAll();
         List<GeneroDTO> generosDTO = generos.stream()
@@ -35,6 +40,7 @@ public class GeneroController {
 
     @GET
     @Path("/{id}")
+    @PermitAll
     public Response buscarPorId(@PathParam("id") Integer id) {
         Genero genero = repositorioGeneros.findById(id);
         if (genero == null) {
@@ -44,6 +50,7 @@ public class GeneroController {
     }
 
     @POST
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response criar(GeneroDTO generoDTO) {
         Genero genero = transformeEmEntidade(generoDTO);
@@ -61,6 +68,7 @@ public class GeneroController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, GeneroDTO generoDTO) {
         Genero genero = repositorioGeneros.findById(id);
@@ -79,6 +87,7 @@ public class GeneroController {
 
     @GET
     @Path("/{id}/livros")
+    @PermitAll
     public Response listarLivros(@PathParam("id") Integer id) {
         Genero genero = repositorioGeneros.findById(id);
         if (genero == null) {
@@ -92,6 +101,7 @@ public class GeneroController {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioGeneros.deleteById(id);

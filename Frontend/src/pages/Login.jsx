@@ -101,8 +101,8 @@ function Login() {
 
         <p className="form-help">
           {isAdmin
-            ? "Funcionários: POST /funcionarios/login. Teste: admin@biblioteca.com / 123."
-            : "Clientes: POST /clientes/login. Testes: cliente@biblioteca.com / 123 ou maria@biblioteca.com / 123."}
+            ? "Acesso administrativo. Teste: admin@biblioteca.com / 123."
+            : "Acesso de cliente. Testes: cliente@biblioteca.com / 123 ou maria@biblioteca.com / 123."}
         </p>
       </div>
     </div>
