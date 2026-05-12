@@ -32,10 +32,10 @@ const RESOURCE_ICONS = {
 	fotos: faCamera,
 	funcionarios: faUserTie,
 	generos: faTag,
-	"historico-cliente": faClockRotateLeft,
+	"historico": faClockRotateLeft,
 	livros: faBook,
 	logs: faFileLines,
-	"movimentacao-estoque": faArrowsRotate,
+	"movimentacao": faArrowsRotate,
 	multas: faMoneyCheckDollar,
 	reservas: faBookmark,
 };
@@ -43,8 +43,8 @@ const RESOURCE_ICONS = {
 const SIDEBAR_GROUPS = [
 	{ label: "Acervo", keys: ["livros", "autores", "generos", "fotos"] },
 	{ label: "Pessoas", keys: ["clientes", "funcionarios"] },
-	{ label: "Operações", keys: ["estoque", "movimentacao-estoque", "reservas", "multas"] },
-	{ label: "Sistema", keys: ["logs", "historico-cliente"] },
+	{ label: "Operações", keys: ["estoque", "movimentacao", "reservas", "multas"] },
+	{ label: "Sistema", keys: ["logs", "historico"] },
 ];
 
 // ── Painel genérico de CRUD ────────────────────────────────────────────────────

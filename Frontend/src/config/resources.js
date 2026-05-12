@@ -82,9 +82,9 @@ export const resources = [
     fields: [{ name: "nomeGenero", label: "Nome do Genero", type: "text" }],
   },
   {
-    key: "historico-cliente",
+    key: "historico",
     label: "Historico de Cliente",
-    path: "/historico-cliente",
+    path: "/historico",
     idFields: ["idHistorico"],
     supportsUpdate: false,
     fields: [
@@ -130,9 +130,9 @@ export const resources = [
     ],
   },
   {
-    key: "movimentacao-estoque",
+    key: "movimentacao",
     label: "Movimentacao de Estoque",
-    path: "/movimentacao-estoque",
+    path: "/movimentacao",
     idFields: ["idMovimentacao"],
     supportsUpdate: false,
     fields: [
