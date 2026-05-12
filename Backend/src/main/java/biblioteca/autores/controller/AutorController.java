@@ -3,6 +3,7 @@ package biblioteca.autores.controller;
 import biblioteca.autores.data.Autor;
 import biblioteca.autores.models.AutorDTO;
 import biblioteca.autores.repository.RepositorioAutores;
+import biblioteca.livros.models.LivroDTO;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -60,6 +61,19 @@ public class AutorController {
         return Response.ok(transformeEmDto(autor)).build();
     }
 
+    @GET
+    @Path("/{id}/livros")
+    public Response listarLivros(@PathParam("id") Integer id) {
+        Autor autor = repositorioAutores.findById(id);
+        if (autor == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<LivroDTO> livros = autor.getLivros().stream()
+                .map(this::toLivroDtoResumo)
+                .toList();
+        return Response.ok(livros).build();
+    }
+
     @DELETE
     @Path("/{id}")
     @Transactional
@@ -82,5 +96,12 @@ public class AutorController {
         Autor autor = new Autor();
         autor.setNomeAutor(dto.getNomeAutor());
         return autor;
+    }
+
+    private LivroDTO toLivroDtoResumo(biblioteca.livros.data.Livro livro) {
+        LivroDTO ld = new LivroDTO();
+        ld.setIdLivro(livro.getIdLivro());
+        ld.setNomeLivro(livro.getNomeLivro());
+        return ld;
     }
 }

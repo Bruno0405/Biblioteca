@@ -1,5 +1,10 @@
 package biblioteca.livros.models;
 
+import biblioteca.autores.models.AutorDTO;
+import biblioteca.generos.models.GeneroDTO;
+import java.util.List;
+import java.util.Set;
+
 public class LivroDTO {
 
     private Integer idLivro;
@@ -9,6 +14,12 @@ public class LivroDTO {
     private Integer ano;
     private String sinopse;
     private String localizacaoFisica;
+
+    private Set<Integer> idAutores;
+    private Set<Integer> idGeneros;
+
+    private List<AutorDTO> autores;
+    private List<GeneroDTO> generos;
 
     public Integer getIdLivro() {
         return idLivro;
@@ -64,5 +75,37 @@ public class LivroDTO {
 
     public void setLocalizacaoFisica(String localizacaoFisica) {
         this.localizacaoFisica = localizacaoFisica;
+    }
+
+    public Set<Integer> getIdAutores() {
+        return idAutores;
+    }
+
+    public void setIdAutores(Set<Integer> idAutores) {
+        this.idAutores = idAutores;
+    }
+
+    public Set<Integer> getIdGeneros() {
+        return idGeneros;
+    }
+
+    public void setIdGeneros(Set<Integer> idGeneros) {
+        this.idGeneros = idGeneros;
+    }
+
+    public List<AutorDTO> getAutores() {
+        return autores;
+    }
+
+    public void setAutores(List<AutorDTO> autores) {
+        this.autores = autores;
+    }
+
+    public List<GeneroDTO> getGeneros() {
+        return generos;
+    }
+
+    public void setGeneros(List<GeneroDTO> generos) {
+        this.generos = generos;
     }
 }

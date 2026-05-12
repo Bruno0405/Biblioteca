@@ -1,5 +1,11 @@
 package biblioteca.livros.controller;
 
+import biblioteca.autores.data.Autor;
+import biblioteca.autores.models.AutorDTO;
+import biblioteca.autores.repository.RepositorioAutores;
+import biblioteca.generos.data.Genero;
+import biblioteca.generos.models.GeneroDTO;
+import biblioteca.generos.repository.RepositorioGeneros;
 import biblioteca.livros.data.Livro;
 import biblioteca.livros.models.LivroDTO;
 import biblioteca.livros.repository.RepositorioLivros;
@@ -16,7 +22,10 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Path("/livros")
 @Produces(MediaType.APPLICATION_JSON)
@@ -25,6 +34,12 @@ public class LivroController {
 
     @Inject
     RepositorioLivros repositorioLivros;
+
+    @Inject
+    RepositorioAutores repositorioAutores;
+
+    @Inject
+    RepositorioGeneros repositorioGeneros;
 
     @GET
     public Response listarTodos(@QueryParam("nome") String nome,
@@ -73,6 +88,16 @@ public class LivroController {
     public Response criar(LivroDTO livroDTO) {
         Livro livro = transformeEmEntidade(livroDTO);
 
+        if (livroDTO.getIdAutores() != null && !livroDTO.getIdAutores().isEmpty()) {
+            List<Autor> autores = repositorioAutores.list("idAutor IN ?1", livroDTO.getIdAutores());
+            livro.setAutores(new HashSet<>(autores));
+        }
+
+        if (livroDTO.getIdGeneros() != null && !livroDTO.getIdGeneros().isEmpty()) {
+            List<Genero> generos = repositorioGeneros.list("idGenero IN ?1", livroDTO.getIdGeneros());
+            livro.setGeneros(new HashSet<>(generos));
+        }
+
         repositorioLivros.persist(livro);
 
         return Response
@@ -100,11 +125,101 @@ public class LivroController {
         livro.setSinopse(livroDTO.getSinopse());
         livro.setLocalizacaoFisica(livroDTO.getLocalizacaoFisica());
 
+        if (livroDTO.getIdAutores() != null) {
+            List<Autor> autores = repositorioAutores.list("idAutor IN ?1", livroDTO.getIdAutores());
+            livro.setAutores(new HashSet<>(autores));
+        }
+
+        if (livroDTO.getIdGeneros() != null) {
+            List<Genero> generos = repositorioGeneros.list("idGenero IN ?1", livroDTO.getIdGeneros());
+            livro.setGeneros(new HashSet<>(generos));
+        }
+
         repositorioLivros.persist(livro);
 
         return Response
                 .ok(tranformeEmDto(livro))
                 .build();
+    }
+
+    @GET
+    @Path("/{id}/autores")
+    public Response listarAutores(@PathParam("id") Integer id) {
+        Livro livro = repositorioLivros.findById(id);
+        if (livro == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<AutorDTO> autores = livro.getAutores().stream()
+                .map(this::toAutorDto)
+                .toList();
+        return Response.ok(autores).build();
+    }
+
+    @POST
+    @Path("/{id}/autores")
+    @Transactional
+    public Response adicionarAutores(@PathParam("id") Integer id, Set<Integer> idAutores) {
+        Livro livro = repositorioLivros.findById(id);
+        if (livro == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<Autor> autores = repositorioAutores.list("idAutor IN ?1", idAutores);
+        livro.getAutores().addAll(autores);
+        repositorioLivros.persist(livro);
+        return Response.ok(tranformeEmDto(livro)).build();
+    }
+
+    @DELETE
+    @Path("/{id}/autores/{idAutor}")
+    @Transactional
+    public Response removerAutor(@PathParam("id") Integer id, @PathParam("idAutor") Integer idAutor) {
+        Livro livro = repositorioLivros.findById(id);
+        if (livro == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        livro.getAutores().removeIf(a -> a.getIdAutor().equals(idAutor));
+        repositorioLivros.persist(livro);
+        return Response.noContent().build();
+    }
+
+    @GET
+    @Path("/{id}/generos")
+    public Response listarGeneros(@PathParam("id") Integer id) {
+        Livro livro = repositorioLivros.findById(id);
+        if (livro == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<GeneroDTO> generos = livro.getGeneros().stream()
+                .map(this::toGeneroDto)
+                .toList();
+        return Response.ok(generos).build();
+    }
+
+    @POST
+    @Path("/{id}/generos")
+    @Transactional
+    public Response adicionarGeneros(@PathParam("id") Integer id, Set<Integer> idGeneros) {
+        Livro livro = repositorioLivros.findById(id);
+        if (livro == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<Genero> generos = repositorioGeneros.list("idGenero IN ?1", idGeneros);
+        livro.getGeneros().addAll(generos);
+        repositorioLivros.persist(livro);
+        return Response.ok(tranformeEmDto(livro)).build();
+    }
+
+    @DELETE
+    @Path("/{id}/generos/{idGenero}")
+    @Transactional
+    public Response removerGenero(@PathParam("id") Integer id, @PathParam("idGenero") Integer idGenero) {
+        Livro livro = repositorioLivros.findById(id);
+        if (livro == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        livro.getGeneros().removeIf(g -> g.getIdGenero().equals(idGenero));
+        repositorioLivros.persist(livro);
+        return Response.noContent().build();
     }
 
     @DELETE
@@ -133,7 +248,38 @@ public class LivroController {
         dto.setAno(livro.getAno());
         dto.setSinopse(livro.getSinopse());
         dto.setLocalizacaoFisica(livro.getLocalizacaoFisica());
+
+        if (livro.getAutores() != null) {
+            dto.setAutores(livro.getAutores().stream()
+                    .map(this::toAutorDto)
+                    .toList());
+        } else {
+            dto.setAutores(Collections.emptyList());
+        }
+
+        if (livro.getGeneros() != null) {
+            dto.setGeneros(livro.getGeneros().stream()
+                    .map(this::toGeneroDto)
+                    .toList());
+        } else {
+            dto.setGeneros(Collections.emptyList());
+        }
+
         return dto;
+    }
+
+    private AutorDTO toAutorDto(Autor autor) {
+        AutorDTO ad = new AutorDTO();
+        ad.setIdAutor(autor.getIdAutor());
+        ad.setNomeAutor(autor.getNomeAutor());
+        return ad;
+    }
+
+    private GeneroDTO toGeneroDto(Genero genero) {
+        GeneroDTO gd = new GeneroDTO();
+        gd.setIdGenero(genero.getIdGenero());
+        gd.setNomeGenero(genero.getNomeGenero());
+        return gd;
     }
 
     private Livro transformeEmEntidade(LivroDTO dto) {

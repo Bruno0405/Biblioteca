@@ -1,5 +1,7 @@
 package biblioteca.multas.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import biblioteca.reservas.data.Reserva;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -16,6 +18,11 @@ public class Multa extends PanacheEntityBase {
 
     @Column(name = "id_reserva")
     private Integer idReserva;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_reserva", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Reserva reserva;
 
     @Column(name = "valor_multa")
     private BigDecimal valorMulta;
@@ -41,6 +48,13 @@ public class Multa extends PanacheEntityBase {
     }
     public void setIdReserva(Integer idReserva) {
         this.idReserva = idReserva;
+    }
+
+    public Reserva getReserva() {
+        return reserva;
+    }
+    public void setReserva(Reserva reserva) {
+        this.reserva = reserva;
     }
 
     public BigDecimal getValorMulta() {

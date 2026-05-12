@@ -1,5 +1,7 @@
 package biblioteca.historico_cliente.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import biblioteca.clientes.data.Cliente;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -15,6 +17,11 @@ public class HistoricoCliente extends PanacheEntityBase {
 
     @Column(name = "id_cliente")
     private Integer idCliente;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cliente", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Cliente cliente;
 
     @Column(name = "campo_alterado")
     private String campoAlterado;
@@ -40,6 +47,13 @@ public class HistoricoCliente extends PanacheEntityBase {
     }
     public void setIdCliente(Integer idCliente) {
         this.idCliente = idCliente;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
     public String getCampoAlterado() {

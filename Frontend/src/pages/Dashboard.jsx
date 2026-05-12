@@ -257,10 +257,6 @@ const [livros, setLivros] = useState([]);
 const [reservas, setReservas] = useState([]);
 const [estoques, setEstoques] = useState([]);
 const [fotos, setFotos] = useState([]);
-const [autores, setAutores] = useState([]);
-const [livroAutores, setLivroAutores] = useState([]);
-const [generos, setGeneros] = useState([]);
-const [livroGeneros, setLivroGeneros] = useState([]);
 const [multas, setMultas] = useState([]);
 
 const [loading, setLoading] = useState(false);
@@ -280,27 +276,18 @@ setLoading(true);
 setError("");
 try {
 const [
-livrosRes, reservasRes, estoquesRes, fotosRes,
-autoresRes, livroAutoresRes, generosRes, livroGenerosRes
+livrosRes, reservasRes, estoquesRes, fotosRes
 ] = await Promise.all([
 apiClient.get("/livros"),
 apiClient.get("/reservas", { params: { idCliente: user.id } }),
 apiClient.get("/estoque"),
 apiClient.get("/fotos"),
-apiClient.get("/autores"),
-apiClient.get("/livro-autor"),
-apiClient.get("/generos"),
-apiClient.get("/livro-genero"),
 ]);
 
 setLivros(livrosRes.data || []);
 setReservas(reservasRes.data || []);
 setEstoques(estoquesRes.data || []);
 setFotos(fotosRes.data || []);
-setAutores(autoresRes.data || []);
-setLivroAutores(livroAutoresRes.data || []);
-setGeneros(generosRes.data || []);
-setLivroGeneros(livroGenerosRes.data || []);
 
 try {
 const multasRes = await apiClient.get("/multas", { params: { idCliente: user.id } });
@@ -348,27 +335,24 @@ return map;
 }, [fotos]);
 
 const autorPorLivro = useMemo(() => {
-const autorNome = new Map(autores.map((a) => [Number(a.idAutor), a.nomeAutor]));
 const map = new Map();
-livroAutores.forEach((la) => {
-const nome = autorNome.get(Number(la.idAutor));
-if (!nome) return;
-const prev = map.get(Number(la.idLivro));
-map.set(Number(la.idLivro), prev ? prev + ", " + nome : nome);
+livros.forEach((livro) => {
+if (livro.autores && livro.autores.length > 0) {
+map.set(Number(livro.idLivro), livro.autores.map((a) => a.nomeAutor).join(", "));
+}
 });
 return map;
-}, [autores, livroAutores]);
+}, [livros]);
 
 const generoPorLivro = useMemo(() => {
-const generoNome = new Map(generos.map((g) => [Number(g.idGenero), g.nomeGenero]));
 const map = new Map();
-livroGeneros.forEach((lg) => {
-const nome = generoNome.get(Number(lg.idGenero));
-if (!nome) return;
-if (!map.has(Number(lg.idLivro))) map.set(Number(lg.idLivro), nome);
+livros.forEach((livro) => {
+if (livro.generos && livro.generos.length > 0) {
+map.set(Number(livro.idLivro), livro.generos[0].nomeGenero);
+}
 });
 return map;
-}, [generos, livroGeneros]);
+}, [livros]);
 
 const livrosDisponiveis = useMemo(
 () => livros.filter((l) => (estoquePorLivro.get(Number(l.idLivro)) || 0) > 0),

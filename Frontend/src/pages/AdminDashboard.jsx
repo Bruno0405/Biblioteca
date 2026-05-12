@@ -4,7 +4,6 @@ import {
 	faArrowsRotate,
 	faBook,
 	faBookmark,
-	faBookOpen,
 	faBoxesStacked,
 	faCamera,
 	faCheck,
@@ -34,8 +33,6 @@ const RESOURCE_ICONS = {
 	funcionarios: faUserTie,
 	generos: faTag,
 	"historico-cliente": faClockRotateLeft,
-	"livro-autor": faBookOpen,
-	"livro-genero": faBookOpen,
 	livros: faBook,
 	logs: faFileLines,
 	"movimentacao-estoque": faArrowsRotate,
@@ -44,7 +41,7 @@ const RESOURCE_ICONS = {
 };
 
 const SIDEBAR_GROUPS = [
-	{ label: "Acervo", keys: ["livros", "autores", "generos", "fotos", "livro-autor", "livro-genero"] },
+	{ label: "Acervo", keys: ["livros", "autores", "generos", "fotos"] },
 	{ label: "Pessoas", keys: ["clientes", "funcionarios"] },
 	{ label: "Operações", keys: ["estoque", "movimentacao-estoque", "reservas", "multas"] },
 	{ label: "Sistema", keys: ["logs", "historico-cliente"] },

@@ -96,28 +96,6 @@ export const resources = [
     ],
   },
   {
-    key: "livro-autor",
-    label: "Livro x Autor",
-    path: "/livro-autor",
-    idFields: ["idLivro", "idAutor"],
-    supportsUpdate: false,
-    fields: [
-      { name: "idLivro", label: "Livro", type: "number", lookup: { resource: "livros", labelField: "nomeLivro" } },
-      { name: "idAutor", label: "Autor", type: "number", lookup: { resource: "autores", labelField: "nomeAutor" } },
-    ],
-  },
-  {
-    key: "livro-genero",
-    label: "Livro x Genero",
-    path: "/livro-genero",
-    idFields: ["idLivro", "idGenero"],
-    supportsUpdate: false,
-    fields: [
-      { name: "idLivro", label: "Livro", type: "number", lookup: { resource: "livros", labelField: "nomeLivro" } },
-      { name: "idGenero", label: "Genero", type: "number", lookup: { resource: "generos", labelField: "nomeGenero" } },
-    ],
-  },
-  {
     key: "livros",
     label: "Livros",
     path: "/livros",

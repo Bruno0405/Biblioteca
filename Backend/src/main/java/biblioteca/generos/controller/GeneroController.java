@@ -3,6 +3,7 @@ package biblioteca.generos.controller;
 import biblioteca.generos.data.Genero;
 import biblioteca.generos.models.GeneroDTO;
 import biblioteca.generos.repository.RepositorioGeneros;
+import biblioteca.livros.models.LivroDTO;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -61,6 +62,19 @@ public class GeneroController {
         return Response.ok(transformeEmDto(genero)).build();
     }
 
+    @GET
+    @Path("/{id}/livros")
+    public Response listarLivros(@PathParam("id") Integer id) {
+        Genero genero = repositorioGeneros.findById(id);
+        if (genero == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<LivroDTO> livros = genero.getLivros().stream()
+                .map(this::toLivroDtoResumo)
+                .toList();
+        return Response.ok(livros).build();
+    }
+
     @DELETE
     @Path("/{id}")
     @Transactional
@@ -83,5 +97,12 @@ public class GeneroController {
         Genero genero = new Genero();
         genero.setNomeGenero(dto.getNomeGenero());
         return genero;
+    }
+
+    private LivroDTO toLivroDtoResumo(biblioteca.livros.data.Livro livro) {
+        LivroDTO ld = new LivroDTO();
+        ld.setIdLivro(livro.getIdLivro());
+        ld.setNomeLivro(livro.getNomeLivro());
+        return ld;
     }
 }

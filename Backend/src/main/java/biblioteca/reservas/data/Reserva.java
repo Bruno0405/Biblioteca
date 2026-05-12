@@ -1,5 +1,9 @@
 package biblioteca.reservas.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import biblioteca.clientes.data.Cliente;
+import biblioteca.funcionarios.data.Funcionario;
+import biblioteca.livros.data.Livro;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -16,14 +20,34 @@ public class Reserva extends PanacheEntityBase {
     @Column(name = "id_cliente")
     private Integer idCliente;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cliente", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Cliente cliente;
+
     @Column(name = "id_livro")
     private Integer idLivro;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_livro", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Livro livro;
 
     @Column(name = "id_funcionario_retirada")
     private Integer idFuncionarioRetirada;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_funcionario_retirada", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Funcionario funcionarioRetirada;
+
     @Column(name = "id_funcionario_devolucao")
     private Integer idFuncionarioDevolucao;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_funcionario_devolucao", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Funcionario funcionarioDevolucao;
 
     @Column(name = "data_reserva")
     private LocalDate dataReserva;
@@ -60,11 +84,25 @@ public class Reserva extends PanacheEntityBase {
         this.idCliente = idCliente;
     }
 
+    public Cliente getCliente() {
+        return cliente;
+    }
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
     public Integer getIdLivro() {
         return idLivro;
     }
     public void setIdLivro(Integer idLivro) {
         this.idLivro = idLivro;
+    }
+
+    public Livro getLivro() {
+        return livro;
+    }
+    public void setLivro(Livro livro) {
+        this.livro = livro;
     }
 
     public Integer getIdFuncionarioRetirada() {
@@ -74,11 +112,25 @@ public class Reserva extends PanacheEntityBase {
         this.idFuncionarioRetirada = idFuncionarioRetirada;
     }
 
+    public Funcionario getFuncionarioRetirada() {
+        return funcionarioRetirada;
+    }
+    public void setFuncionarioRetirada(Funcionario funcionarioRetirada) {
+        this.funcionarioRetirada = funcionarioRetirada;
+    }
+
     public Integer getIdFuncionarioDevolucao() {
         return idFuncionarioDevolucao;
     }
     public void setIdFuncionarioDevolucao(Integer idFuncionarioDevolucao) {
         this.idFuncionarioDevolucao = idFuncionarioDevolucao;
+    }
+
+    public Funcionario getFuncionarioDevolucao() {
+        return funcionarioDevolucao;
+    }
+    public void setFuncionarioDevolucao(Funcionario funcionarioDevolucao) {
+        this.funcionarioDevolucao = funcionarioDevolucao;
     }
 
     public LocalDate getDataReserva() {
