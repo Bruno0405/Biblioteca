@@ -82,9 +82,9 @@ export const resources = [
     fields: [{ name: "nomeGenero", label: "Nome do Genero", type: "text" }],
   },
   {
-    key: "historico-cliente",
+    key: "historico",
     label: "Historico de Cliente",
-    path: "/historico-cliente",
+    path: "/historico",
     idFields: ["idHistorico"],
     supportsUpdate: false,
     fields: [
@@ -93,28 +93,6 @@ export const resources = [
       { name: "valorAntigo", label: "Valor Antigo", type: "text" },
       { name: "valorNovo", label: "Valor Novo", type: "text" },
       { name: "dataAlteracao", label: "Data Alteracao", type: "datetime-local" },
-    ],
-  },
-  {
-    key: "livro-autor",
-    label: "Livro x Autor",
-    path: "/livro-autor",
-    idFields: ["idLivro", "idAutor"],
-    supportsUpdate: false,
-    fields: [
-      { name: "idLivro", label: "Livro", type: "number", lookup: { resource: "livros", labelField: "nomeLivro" } },
-      { name: "idAutor", label: "Autor", type: "number", lookup: { resource: "autores", labelField: "nomeAutor" } },
-    ],
-  },
-  {
-    key: "livro-genero",
-    label: "Livro x Genero",
-    path: "/livro-genero",
-    idFields: ["idLivro", "idGenero"],
-    supportsUpdate: false,
-    fields: [
-      { name: "idLivro", label: "Livro", type: "number", lookup: { resource: "livros", labelField: "nomeLivro" } },
-      { name: "idGenero", label: "Genero", type: "number", lookup: { resource: "generos", labelField: "nomeGenero" } },
     ],
   },
   {
@@ -152,9 +130,9 @@ export const resources = [
     ],
   },
   {
-    key: "movimentacao-estoque",
+    key: "movimentacao",
     label: "Movimentacao de Estoque",
-    path: "/movimentacao-estoque",
+    path: "/movimentacao",
     idFields: ["idMovimentacao"],
     supportsUpdate: false,
     fields: [

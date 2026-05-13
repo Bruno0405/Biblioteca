@@ -3,6 +3,12 @@ package biblioteca.multas.controller;
 import biblioteca.multas.data.Multa;
 import biblioteca.multas.models.MultaDTO;
 import biblioteca.multas.repository.RepositorioMultas;
+import biblioteca.reservas.data.Reserva;
+import biblioteca.reservas.repository.RepositorioReservas;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -10,23 +16,47 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.QueryParam;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 @Path("/multas")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class MultaController {
 
     @Inject
     RepositorioMultas repositorioMultas;
 
+    @Inject
+    RepositorioReservas repositorioReservas;
+
+    @Inject
+    LogService logService;
+
+    @Inject
+    JsonWebToken jwt;
+
     @GET
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     public Response listarTodos(
             @QueryParam("idReserva") Integer idReserva,
             @QueryParam("status") String status) {
 
+        String userType = jwt.getClaim("userType");
         List<Multa> multas;
 
-        if (idReserva != null) {
+        if ("cliente".equals(userType)) {
+            Integer userId = Integer.valueOf(jwt.getClaim("userId").toString());
+            List<Reserva> reservas = repositorioReservas.list("idCliente", userId);
+            List<Integer> idsReservas = reservas.stream()
+                    .map(Reserva::getIdReserva)
+                    .collect(Collectors.toList());
+            if (idsReservas.isEmpty()) {
+                return Response.ok(List.of()).build();
+            }
+            multas = repositorioMultas.list("idReserva IN ?1", idsReservas);
+        } else if (idReserva != null) {
             multas = repositorioMultas.list("idReserva", idReserva);
         } else if (status != null) {
             multas = repositorioMultas.list("statusMulta", status);
@@ -42,6 +72,7 @@ public class MultaController {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     public Response buscarPorId(@PathParam("id") Integer id) {
         Multa multa = repositorioMultas.findById(id);
         if (multa == null) {
@@ -51,10 +82,16 @@ public class MultaController {
     }
 
     @POST
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response criar(MultaDTO multaDTO) {
         Multa multa = transformeEmEntidade(multaDTO);
         repositorioMultas.persist(multa);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou multa");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(multa))
@@ -63,6 +100,7 @@ public class MultaController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, MultaDTO multaDTO) {
         Multa multa = repositorioMultas.findById(id);
@@ -75,17 +113,28 @@ public class MultaController {
         multa.setStatusMulta(multaDTO.getStatusMulta());
         multa.setDataPagamento(multaDTO.getDataPagamento());
         repositorioMultas.persist(multa);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou multa (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(multa)).build();
     }
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioMultas.deleteById(id);
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu multa (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 

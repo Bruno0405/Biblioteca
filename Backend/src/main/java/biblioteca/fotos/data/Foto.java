@@ -1,5 +1,7 @@
 package biblioteca.fotos.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import biblioteca.livros.data.Livro;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
@@ -14,6 +16,11 @@ public class Foto extends PanacheEntityBase {
 
     @Column(name = "id_livro")
     private Integer idLivro;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_livro", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Livro livro;
 
     @Column(name = "foto")
     private String foto;
@@ -30,6 +37,13 @@ public class Foto extends PanacheEntityBase {
     }
     public void setIdLivro(Integer idLivro) {
         this.idLivro = idLivro;
+    }
+
+    public Livro getLivro() {
+        return livro;
+    }
+    public void setLivro(Livro livro) {
+        this.livro = livro;
     }
 
     public String getFoto() {

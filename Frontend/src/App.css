@@ -316,9 +316,16 @@ flex-shrink: 0;
 }
 
 .sidebar-nav nav {
-display: grid;
-gap: 2px;
-align-content: start;
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-nav nav::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar-nav-item {

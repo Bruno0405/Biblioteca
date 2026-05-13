@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
-import { login, loginFuncionario } from "../services/authService";
+import { login as loginService } from "../services/authService";
 
 export function AuthProvider({ children }) {
   const STORAGE_KEY = "biblioteca-user";
@@ -10,48 +10,35 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    function rehydrateSession() {
-      const rawUser = localStorage.getItem(STORAGE_KEY);
-      if (!rawUser) {
-        setLoading(false);
-        return;
-      }
-
+    const rawUser = localStorage.getItem(STORAGE_KEY);
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (rawUser && token) {
       try {
-        const parsedUser = JSON.parse(rawUser);
-        setUser(parsedUser);
+        setUser(JSON.parse(rawUser));
       } catch {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(TOKEN_KEY);
       }
-
-      setLoading(false);
     }
-
-    rehydrateSession();
+    setLoading(false);
   }, []);
 
-  async function handleLogin(email, password, type) {
-    let currentUser;
-    if (type === "funcionario") {
-      const funcionario = await loginFuncionario(email, password);
-      currentUser = {
-        id: funcionario.idFuncionario,
-        name: funcionario.nome,
-        email: funcionario.email,
-        role: "ADMIN",
-        raw: funcionario,
-      };
-    } else {
-      const cliente = await login(email, password);
-      currentUser = {
-        id: cliente.idCliente,
-        name: cliente.nomeCliente,
-        email: cliente.email,
-        role: "USER",
-        raw: cliente,
-      };
-    }
+  async function handleLogin(email, password, tipo) {
+    const data = await loginService(email, password, tipo);
+
+    const role = tipo === "funcionario" ? "ADMIN" : "USER";
+
+    const currentUser = {
+      id: data.userId,
+      name: data.name,
+      email: data.email,
+      role,
+      tipo: data.tipo,
+      perfil: data.perfil,
+      raw: data,
+    };
+
+    localStorage.setItem(TOKEN_KEY, data.token);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
     setUser(currentUser);
   }

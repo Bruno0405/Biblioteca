@@ -3,6 +3,10 @@ package biblioteca.estoque.controller;
 import biblioteca.estoque.data.Estoque;
 import biblioteca.estoque.models.EstoqueDTO;
 import biblioteca.estoque.repository.RepositorioEstoque;
+import biblioteca.logs.data.Log;
+import biblioteca.logs.services.LogService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -14,12 +18,17 @@ import java.util.List;
 @Path("/estoque")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class EstoqueController {
 
     @Inject
     RepositorioEstoque repositorioEstoque;
 
+    @Inject
+    LogService logService;
+
     @GET
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     public Response listarTodos(
             @QueryParam("idLivro") Integer idLivro,
             @QueryParam("disponivel") Boolean disponivel) {
@@ -42,6 +51,7 @@ public class EstoqueController {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"cliente", "funcionario", "gerente", "admin"})
     public Response buscarPorId(@PathParam("id") Integer id) {
         Estoque estoque = repositorioEstoque.findById(id);
         if (estoque == null) {
@@ -51,10 +61,16 @@ public class EstoqueController {
     }
 
     @POST
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response criar(EstoqueDTO estoqueDTO) {
         Estoque estoque = transformeEmEntidade(estoqueDTO);
         repositorioEstoque.persist(estoque);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Criou estoque");
+        logService.log(logEntry);
+
         return Response
                 .status(Response.Status.CREATED)
                 .entity(transformeEmDto(estoque))
@@ -63,6 +79,7 @@ public class EstoqueController {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"gerente", "admin"})
     @Transactional
     public Response atualizar(@PathParam("id") Integer id, EstoqueDTO estoqueDTO) {
         Estoque estoque = repositorioEstoque.findById(id);
@@ -76,17 +93,28 @@ public class EstoqueController {
         estoque.setQuantidadeDanificada(estoqueDTO.getQuantidadeDanificada());
         estoque.setEstoqueMinimo(estoqueDTO.getEstoqueMinimo());
         repositorioEstoque.persist(estoque);
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Atualizou estoque (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.ok(transformeEmDto(estoque)).build();
     }
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("admin")
     @Transactional
     public Response deletar(@PathParam("id") Integer id) {
         boolean deletado = repositorioEstoque.deleteById(id);
         if (!deletado) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        Log logEntry = new Log();
+        logEntry.setAcao("Removeu estoque (id: " + id + ")");
+        logService.log(logEntry);
+
         return Response.noContent().build();
     }
 
