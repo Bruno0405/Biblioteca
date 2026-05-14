@@ -86,7 +86,7 @@ function LivroCard({ livro, estoquePorLivro, fotoPorLivro, autorPorLivro, genero
 	);
 }
 
-function LivroModal({ livro, estoquePorLivro, fotoPorLivro, autorPorLivro, generoPorLivro, onClose, onReservar, reservaLoading, reservaError }) {
+function LivroModal({ livro, estoquePorLivro, fotoPorLivro, autorPorLivro, generoPorLivro, onClose, onReservar, reservaLoading, reservaError, canReservar }) {
 	const [dataReserva, setDataReserva] = useState(today());
 	const [dataDevolucao, setDataDevolucao] = useState("");
 	const [codigoReserva] = useState(() => "RSV-" + Math.random().toString(36).slice(2, 8).toUpperCase());
@@ -157,7 +157,7 @@ function LivroModal({ livro, estoquePorLivro, fotoPorLivro, autorPorLivro, gener
 							</div>
 						)}
 
-						{disponibilidade > 0 && (
+						{canReservar && disponibilidade > 0 && (
 							<form className="modal-reserva-form" onSubmit={handleSubmit}>
 								<h4>Reservar este livro</h4>
 								{reservaError && <p className="form-error">{String(reservaError)}</p>}
@@ -167,7 +167,7 @@ function LivroModal({ livro, estoquePorLivro, fotoPorLivro, autorPorLivro, gener
 										<input type="date" value={dataReserva} onChange={(e) => setDataReserva(e.target.value)} required />
 									</label>
 									<label>
-										Previsão de devolução
+										Data de devolução
 										<input type="date" value={dataDevolucao} onChange={(e) => setDataDevolucao(e.target.value)} />
 									</label>
 									<label>
@@ -273,6 +273,7 @@ function Dashboard() {
 	const [busca, setBusca] = useState("");
 	const [secao, setSecao] = useState("inicio");
 	const [livroAberto, setLivroAberto] = useState(null);
+	const [exibirReservaNoModal, setExibirReservaNoModal] = useState(true);
 	const [reservaLoading, setReservaLoading] = useState(false);
 	const [reservaError, setReservaError] = useState("");
 	const [reservaSucesso, setReservaSucesso] = useState("");
@@ -413,6 +414,7 @@ function Dashboard() {
 			});
 			setReservaSucesso("Reserva realizada com sucesso!");
 			setLivroAberto(null);
+			setExibirReservaNoModal(true);
 			await carregarDados();
 			irParaSecao("reservas");
 		} catch (err) {
@@ -422,12 +424,24 @@ function Dashboard() {
 		}
 	}
 
+	function abrirLivro(livro, canReservar = true) {
+		setLivroAberto(livro);
+		setExibirReservaNoModal(canReservar);
+		setReservaError("");
+	}
+
+	function fecharLivro() {
+		setLivroAberto(null);
+		setReservaError("");
+		setExibirReservaNoModal(true);
+	}
+
 	function handleLogout() {
 		logout();
 		navigate("/");
 	}
 
-	const cardProps = { estoquePorLivro, fotoPorLivro, autorPorLivro, generoPorLivro, onVerLivro: setLivroAberto };
+	const cardProps = { estoquePorLivro, fotoPorLivro, autorPorLivro, generoPorLivro, onVerLivro: (livro) => abrirLivro(livro, true) };
 
 	return (
 		<Layout
@@ -520,7 +534,7 @@ function Dashboard() {
 														<th>Código</th>
 														<th>Livro</th>
 														<th>Data Reserva</th>
-														<th>Previsão Devolução</th>
+														<th>Data de devolução</th>
 														<th>Status</th>
 													</tr>
 												</thead>
@@ -532,7 +546,7 @@ function Dashboard() {
 																<td>{r.codigoReserva || "-"}</td>
 																<td>
 																	{livro
-																		? <button type="button" className="link-btn" onClick={() => setLivroAberto(livro)}>{livro.nomeLivro}</button>
+																			? <button type="button" className="link-btn" onClick={() => abrirLivro(livro, false)}>{livro.nomeLivro}</button>
 																		: r.idLivro}
 																</td>
 																<td>{r.dataReserva || "-"}</td>
@@ -599,10 +613,11 @@ function Dashboard() {
 					fotoPorLivro={fotoPorLivro}
 					autorPorLivro={autorPorLivro}
 					generoPorLivro={generoPorLivro}
-					onClose={() => { setLivroAberto(null); setReservaError(""); }}
+					onClose={fecharLivro}
 					onReservar={reservarLivro}
 					reservaLoading={reservaLoading}
 					reservaError={reservaError}
+					canReservar={exibirReservaNoModal}
 				/>
 			)}
 		</Layout>

@@ -189,7 +189,7 @@ export const resources = [
       { name: "dataReserva", label: "Data Reserva", type: "date" },
       { name: "dataLimiteRetirada", label: "Limite Retirada", type: "date" },
       { name: "dataRetirada", label: "Data Retirada", type: "date" },
-      { name: "dataPrevistaDevolucao", label: "Prevista Devolucao", type: "date" },
+      { name: "dataPrevistaDevolucao", label: "Data de devolução", type: "date" },
       { name: "dataDevolucao", label: "Data Devolucao", type: "date" },
       { name: "statusReserva", label: "Status", type: "text", options: [
         { value: "reservado",  label: "Reservado" },
