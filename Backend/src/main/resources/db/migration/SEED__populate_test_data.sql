@@ -264,8 +264,64 @@ SELECT 15, 7,  0, 0, 0, 1  WHERE NOT EXISTS (SELECT 1 FROM Estoque WHERE id_livr
 -- 9. FOTOS (FK → id_livro — no identity in column list)
 -- ============================================================
 INSERT INTO Fotos (id_livro, foto)
-SELECT 1, 'data:image/png;base64,PLACEHOLDER_DOM_CASMURRO'
+SELECT 1, 'https://m.media-amazon.com/images/I/61x1ZHomWUL._SL1200_.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 1);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 2, 'https://m.media-amazon.com/images/I/61TaHURu27L._SY342_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 2);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 3, 'https://m.media-amazon.com/images/I/81t7altQZxL._SY385_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 3);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 4, 'https://m.media-amazon.com/images/I/819js3EQwbL._SY425_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 4);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 5, 'https://m.media-amazon.com/images/I/81pB+joKL4L._SY385_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 5);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 6, 'https://m.media-amazon.com/images/I/91S5jsMyK1L._SY385_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 6);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 7, 'https://m.media-amazon.com/images/I/71bh8SB8R0L._SY385_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 7);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 8, 'https://m.media-amazon.com/images/I/81Zp6MFxIDL._SY425_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 8);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 9, 'https://m.media-amazon.com/images/I/91g9Dvtf+jL._SY385_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 9);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 10, 'https://m.media-amazon.com/images/I/91BsZhxCRjL._SY425_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 10);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 11, 'https://m.media-amazon.com/images/I/7165XLdWkmL._SY385_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 11);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 12, 'https://m.media-amazon.com/images/I/81QluJ4QXyL._SY385_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 12);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 13, 'https://m.media-amazon.com/images/I/51-9DsDM4DL._SY445_SX342_ML2_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 13);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 14, 'https://m.media-amazon.com/images/I/61-X+Q-DkQL._SY425_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 14);
+
+INSERT INTO Fotos (id_livro, foto)
+SELECT 15, 'https://m.media-amazon.com/images/I/91RMqWB-CTL._SY425_.jpg'
+WHERE NOT EXISTS (SELECT 1 FROM Fotos WHERE id_livro = 15);
 
 -- ============================================================
 -- 10. RESERVAS
