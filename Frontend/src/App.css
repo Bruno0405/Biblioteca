@@ -278,7 +278,7 @@ border: 1px solid #c7d2fe;
    ══════════════════════════════════════ */
 .dashboard-grid {
 display: grid;
-grid-template-columns: 260px 1fr;
+grid-template-columns: 260px minmax(0, 1fr);
 gap: 16px;
 align-items: start;
 }
@@ -401,6 +401,7 @@ border: 1px solid var(--line);
 border-radius: var(--radius);
 box-shadow: var(--shadow);
 padding: 20px;
+min-width: 0;
 }
 
 .panel h3 {
@@ -620,9 +621,19 @@ border-radius: 10px;
 border: 1px solid var(--line);
 }
 
+.user-table-wrap {
+   width: 100%;
+   max-width: 100%;
+   min-width: 0;
+}
+
 table {
 width: 100%;
 border-collapse: collapse;
+}
+
+.user-data-table {
+   table-layout: fixed;
 }
 
 th,
@@ -641,6 +652,17 @@ font-weight: 600;
 font-size: 12px;
 text-transform: uppercase;
 letter-spacing: 0.5px;
+}
+
+.user-data-table th,
+.user-data-table td {
+   overflow-wrap: anywhere;
+   word-break: break-word;
+}
+
+.user-data-table .link-btn {
+   white-space: normal;
+   text-align: left;
 }
 
 tbody tr:last-child td {
@@ -724,6 +746,10 @@ padding: 20px;
 z-index: 1000;
 }
 
+.book-modal-overlay {
+overflow-y: auto;
+}
+
 .modal-card {
 background: var(--bg-card);
 border-radius: 20px;
@@ -735,6 +761,10 @@ overflow-y: auto;
 position: relative;
 padding: 32px;
 scrollbar-width: thin;
+}
+
+.book-modal-card {
+width: min(880px, 100%);
 }
 
 .modal-close {
@@ -767,6 +797,10 @@ gap: 32px;
 align-items: start;
 }
 
+.book-modal-body {
+grid-template-columns: 210px 1fr;
+}
+
 .modal-cover-col {
 display: grid;
 gap: 12px;
@@ -779,6 +813,10 @@ overflow: hidden;
 display: grid;
 place-items: center;
 box-shadow: var(--shadow-md);
+}
+
+.book-modal-cover-shell {
+height: 300px;
 }
 
 .modal-cover-shell img {
@@ -882,7 +920,7 @@ color: var(--accent);
    ══════════════════════════════════════ */
 @media (max-width: 1024px) {
 .dashboard-grid {
-grid-template-columns: 1fr;
+grid-template-columns: minmax(0, 1fr);
 }
 
 .sidebar-nav {
@@ -909,12 +947,15 @@ display: none;
 grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.modal-body {
+.book-modal-body {
 grid-template-columns: 1fr;
 }
 
-.modal-cover-shell {
-height: 200px;
+.book-modal-cover-shell {
+height: auto;
+aspect-ratio: 2 / 3;
+max-width: 260px;
+margin-inline: auto;
 }
 }
 
@@ -949,6 +990,67 @@ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 
 .modal-card {
 padding: 20px 16px;
+}
+
+.book-modal-overlay {
+place-items: start center;
+padding: 8px;
+}
+
+.book-modal-card {
+   max-height: calc(100dvh - 16px);
+   min-height: auto;
+border-radius: 14px;
+padding: 16px 12px 18px;
+   overflow-y: auto;
+}
+
+.book-modal-close {
+top: 10px;
+right: 10px;
+}
+
+.book-modal-body {
+gap: 14px;
+}
+
+.book-modal-cover-shell {
+max-width: 220px;
+}
+
+.book-modal-card .modal-info-col h2 {
+font-size: 22px;
+}
+
+.book-modal-card .modal-meta {
+   display: grid;
+   gap: 6px;
+}
+
+.user-table-wrap {
+   overflow-x: auto;
+   -webkit-overflow-scrolling: touch;
+}
+
+.user-data-table {
+   min-width: 620px;
+   table-layout: auto;
+}
+
+.user-data-table th,
+.user-data-table td {
+   padding: 8px 7px;
+   font-size: 12px;
+   white-space: nowrap;
+}
+
+.user-data-table th {
+   font-size: 10px;
+   letter-spacing: 0.25px;
+}
+
+.user-data-table .link-btn {
+   white-space: nowrap;
 }
 }
 

@@ -114,15 +114,15 @@ function LivroModal({ livro, estoquePorLivro, fotoPorLivro, autorPorLivro, gener
 	}, [onClose]);
 
 	return (
-		<div className="modal-overlay" role="dialog" aria-modal="true" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-			<div className="modal-card">
-				<button className="modal-close" onClick={onClose} aria-label="Fechar">
+		<div className="modal-overlay book-modal-overlay" role="dialog" aria-modal="true" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+			<div className="modal-card book-modal-card">
+				<button className="modal-close book-modal-close" onClick={onClose} aria-label="Fechar">
 					<FontAwesomeIcon icon={faXmark} />
 				</button>
 
-				<div className="modal-body">
+				<div className="modal-body book-modal-body">
 					<div className="modal-cover-col">
-						<div className="modal-cover-shell" style={cover ? {} : { background: palette.bg }}>
+						<div className="modal-cover-shell book-modal-cover-shell" style={cover ? {} : { background: palette.bg }}>
 							{cover
 								? <img src={cover} alt={"Capa de " + livro.nomeLivro} />
 								: (
@@ -527,8 +527,8 @@ function Dashboard() {
 										</p>
 									)
 									: (
-										<div className="table-wrap">
-											<table>
+										<div className="table-wrap user-table-wrap reservas-table-wrap">
+											<table className="user-data-table">
 												<thead>
 													<tr>
 														<th>Código</th>
@@ -574,8 +574,8 @@ function Dashboard() {
 								: multas.length === 0
 									? <p className="muted">Você não possui multas em aberto.</p>
 									: (
-										<div className="table-wrap">
-											<table>
+										<div className="table-wrap user-table-wrap multas-table-wrap">
+											<table className="user-data-table">
 												<thead>
 													<tr>
 														<th>Livro</th>
