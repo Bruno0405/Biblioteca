@@ -353,7 +353,6 @@ def generate_deliverable():
     doc.append("| 20240012 | Jhonatan Rosendo da Silva Alves |")
     doc.append("| 20240798 | Jonathan Martins Melgar |")
     doc.append("| 20240807 | Michelli Segantini da Silva de Lima |")
-    doc.append("| 20240289 | Vinicius Eduardo da Silva |")
     doc.append("")
     doc.append("### Tecnologias do Back-End\n")
     doc.append("")
