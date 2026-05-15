@@ -3,3 +3,6 @@
 
 # Workspace resources.
 .workspace*
+
+# Deliverable.
+**/deliverable.*
