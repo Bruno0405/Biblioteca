@@ -1,0 +1,234 @@
+:root {
+  --bg-950: #0b0d14;
+  --bg-900: #0e1017;
+  --bg-800: #141824;
+  --bg-700: #1a1f2e;
+  --bg-600: #222838;
+  --accent-300: #99d6e8;
+  --accent-400: #5fc3d9;
+  --accent-500: #2eafc9;
+  --accent-600: #1a8aa8;
+  --accent-700: #126f8a;
+  --text-primary: #e8edf2;
+  --text-secondary: #8899aa;
+  --text-muted: #5a6a7a;
+  --glass-bg: rgba(20, 24, 36, 0.7);
+  --glass-border: rgba(47, 175, 201, 0.12);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+html, body {
+  background: var(--bg-900) !important;
+}
+
+.slidev-layout {
+  background:
+    linear-gradient(160deg, var(--bg-950) 0%, var(--bg-900) 35%, var(--bg-800) 65%, var(--bg-700) 100%) !important;
+  color: var(--text-primary) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* === DECORATIVE BACKGROUND SHAPES === */
+
+.slidev-layout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at calc(100% + 200px) -200px, rgba(46, 175, 201, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at -150px calc(100% + 250px), rgba(18, 111, 138, 0.05) 0%, transparent 50%),
+    linear-gradient(rgba(46, 175, 201, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46, 175, 201, 0.025) 1px, transparent 1px);
+  background-size: 500px 500px, 600px 600px, 60px 60px, 60px 60px;
+  background-repeat: no-repeat, no-repeat, repeat, repeat;
+  background-position: right top, left bottom, 0 0, 0 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* === COVER SLIDE === */
+
+.slidev-layout.cover {
+  background: linear-gradient(135deg, var(--bg-950) 0%, var(--bg-900) 25%, var(--bg-800) 50%, var(--bg-700) 75%, var(--bg-600) 100%) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.slidev-layout.cover::before {
+  background:
+    radial-gradient(circle at calc(100% + 300px) -300px, rgba(46, 175, 201, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at -250px calc(100% + 300px), rgba(18, 111, 138, 0.06) 0%, transparent 50%),
+    linear-gradient(rgba(46, 175, 201, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46, 175, 201, 0.02) 1px, transparent 1px);
+  background-size: 700px 700px, 800px 800px, 60px 60px, 60px 60px;
+  background-repeat: no-repeat, no-repeat, repeat, repeat;
+  background-position: right top, left bottom, 0 0, 0 0;
+}
+
+.slidev-layout.cover h1 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-300), var(--accent-500), var(--accent-700));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 30px rgba(46, 175, 201, 0.2));
+}
+
+.slidev-layout.cover > :not(h1) {
+  position: relative;
+  z-index: 1;
+}
+
+.slidev-layout.cover p {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+}
+
+.slidev-layout.cover .text-sm {
+  color: var(--text-muted) !important;
+}
+
+/* === HEADINGS === */
+
+h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-400), var(--accent-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  margin-bottom: 1.2rem;
+  z-index: 1;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent-400);
+  margin-bottom: 0.8rem;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--accent-500);
+  margin-bottom: 0.6rem;
+}
+
+/* === TEXT === */
+
+p, li {
+  color: var(--text-primary) !important;
+  line-height: 1.6;
+}
+
+strong {
+  color: var(--accent-400);
+  font-weight: 600;
+}
+
+/* === LISTS === */
+
+ul, ol {
+  padding-left: 1.2rem;
+}
+
+li {
+  margin-bottom: 0.4rem;
+}
+
+li::marker {
+  color: var(--accent-500);
+}
+
+/* === TABLES === */
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  font-size: 0.85rem;
+}
+
+th {
+  background: linear-gradient(135deg, rgba(46, 175, 201, 0.12), rgba(26, 138, 168, 0.08));
+  color: var(--accent-400);
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  text-align: left;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+td {
+  padding: 0.3rem 0.7rem;
+  border-bottom: 1px solid rgba(95, 195, 217, 0.05);
+  color: var(--text-primary);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* === CODE === */
+
+.slidev-layout :not(pre) > code {
+  background: rgba(46, 175, 201, 0.08);
+  color: var(--accent-400);
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  font-size: 0.9em;
+  border: 1px solid rgba(95, 195, 217, 0.12);
+}
+
+pre {
+  background: rgba(11, 13, 20, 0.85) !important;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.2rem !important;
+  backdrop-filter: blur(8px);
+}
+
+pre code {
+  color: var(--text-primary) !important;
+}
+
+/* === MERMAID === */
+
+.mermaid {
+  display: flex;
+  justify-content: center;
+}
+
+.mermaid svg {
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+}
+
+/* === TWO COLS === */
+
+.slidev-layout.two-cols-header {
+  column-gap: 2rem;
+}
+
+/* === BLOCKQUOTE === */
+
+blockquote {
+  border-left: 3px solid var(--accent-500) !important;
+  background: rgba(46, 175, 201, 0.05);
+  padding: 0.5rem 1rem;
+  border-radius: 0 8px 8px 0;
+}

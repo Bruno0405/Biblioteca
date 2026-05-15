@@ -1,5 +1,5 @@
 ---
-theme: seriph
+theme: default
 layout: cover
 title: Biblioteca - Sistema de Gerenciamento de Biblioteca
 titleTemplate: '%s'
@@ -8,9 +8,11 @@ info: |
   Apresentação para a disciplina de Programação Orientada a Objetos
 drawings:
   persist: false
-transition: fade-out
+transition: slide-left
 mdc: true
 lineNumbers: false
+colorSchema: dark
+canvasWidth: 980
 ---
 
 # Biblioteca
@@ -28,7 +30,7 @@ Programação Orientada a Objetos
 transition: slide-left
 ---
 
-# Agenda
+# Sumário
 
 <div class="grid grid-cols-2 gap-4 pt-4">
 
@@ -37,17 +39,15 @@ transition: slide-left
 1. **Apresentação do Projeto**
 2. **Motivação**
 3. **Tecnologias**
-4. **Arquitetura do Sistema**
-5. **Diagrama de Classes**
+4. **Diagrama de Classes**
 
 </div>
 
 <div>
 
-6. **Funcionalidades Principais**
-8. **Demonstração do Sistema**
-9. **Conclusão**
-10. **Perguntas**
+5. **Funcionalidades Principais**
+6. **Demonstração do Sistema**
+7. **Conclusão**
 
 </div>
 
@@ -82,10 +82,6 @@ Automatizar o ciclo completo de uma biblioteca: cadastro de acervo, controle de 
 
 - **Clientes** — consultam o catálogo e realizam reservas
 - **Funcionários** — gerenciam as operações da biblioteca (Admin, Gerente, Staff)
-
-**Escopo**
-
-Backend (API REST) + Frontend (SPA React) + Banco de Dados (PostgreSQL)
 
 </div>
 
@@ -129,6 +125,7 @@ Criar uma aplicação modernizada que unifica:
 </div>
 
 ---
+zoom: 0.95
 transition: slide-left
 ---
 
@@ -148,8 +145,7 @@ transition: slide-left
 | PostgreSQL | — |
 | Flyway | — |
 | Maven | — |
-| SmallRye OpenAPI | — |
-| SmallRye JWT | — |
+
 
 </div>
 
@@ -186,43 +182,7 @@ transition: slide-left
 </div>
 
 ---
-zoom: 0.75
-transition: slide-left
----
-
-# Arquitetura do Sistema
-
-```mermaid
-flowchart LR
-    subgraph Frontend["Frontend (React SPA)"]
-        CD["Client Dashboard"]
-        AD["Admin Dashboard"]
-        AR["Auth & Routing"]
-    end
-
-    subgraph Backend["Backend (Quarkus REST API)"]
-        direction TB
-        C["Controllers (REST)"]
-        S["Services<br/>(TokenService, LogService)"]
-        R["Repositories<br/>(Panache)"]
-        E["Entities (JPA)"]
-        DTO["DTOs"]
-        E --> R --> C
-        S -.-> C
-        C -.-> DTO
-    end
-
-    subgraph DB["Database"]
-        PG[("PostgreSQL<br/>12 tabelas")]
-        FM["Flyway Migrations<br/>V1–V10 + SEED"]
-    end
-
-    Frontend -- "HTTP/JSON · JWT" --> Backend
-    Backend -- "JDBC" --> DB
-```
-
----
-zoom: 0.65
+zoom: 1.05
 transition: slide-left
 ---
 
@@ -275,7 +235,7 @@ classDiagram
 ```
 
 ---
-zoom: 0.5
+zoom: 0.53
 transition: slide-left
 ---
 
@@ -283,6 +243,7 @@ transition: slide-left
 
 ```mermaid
 classDiagram
+    direction LR
     class Reserva {
         +Integer idReserva
         +LocalDate dataReserva
@@ -371,12 +332,6 @@ transition: slide-left
 
 # Demonstração do Sistema
 
-<div class="pt-4">
-
-## Sistema em Funcionamento
-
-A demonstração será apresentada ao vivo com o sistema rodando localmente.
-
 **Fluxo demonstrado:**
 
 1. **Autenticação** — login como cliente e como funcionário
@@ -385,8 +340,6 @@ A demonstração será apresentada ao vivo com o sistema rodando localmente.
 4. **Administrativo** — funcionário gerencia retirada e devolução
 5. **Multas** — geração automática e visualização
 6. **Estoque** — verificação dos contadores em tempo real
-
-</div>
 
 ---
 transition: slide-left
@@ -426,11 +379,7 @@ transition: fade-out
 layout: center
 ---
 
-# Obrigado!
+# <span class="text-6xl">Obrigado!</span>
 
-<div class="text-center pt-4">
 
-**Repositório:** [github.com/anomalyco/Biblioteca](https://github.com/anomalyco/Biblioteca)
-
-</div>
 
