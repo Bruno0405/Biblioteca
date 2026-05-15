@@ -6,3 +6,10 @@
 
 # Deliverable.
 **/deliverable.*
+
+# Node modules.
+node_modules
+**/node_modules/**
+
+# Presentation output.
+/Presentation/dist/**
