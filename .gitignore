@@ -1,0 +1,8 @@
+# Playwright MCP server.
+.playwright*
+
+# Workspace resources.
+.workspace*
+
+# Deliverable.
+**/deliverable.*
