@@ -4,11 +4,19 @@
   "scripts": {
     "dev": "slidev",
     "build": "slidev build",
-    "export": "slidev export"
+    "export": "slidev export",
+    "export:pdf": "slidev export --format pdf",
+    "export:pptx": "slidev export --format pptx",
+    "export:png": "slidev export --format png",
+    "export:md": "slidev export --format md"
   },
   "dependencies": {
     "@slidev/cli": "^51.5.0",
     "@slidev/theme-default": "^0.25.0",
-    "@slidev/theme-seriph": "^0.25.0"
+    "@slidev/theme-seriph": "^0.25.0",
+    "@slidev/types": "^52.15.2"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.60.0"
   }
 }
