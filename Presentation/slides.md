@@ -343,36 +343,12 @@ transition: slide-left
 
 ---
 transition: slide-left
+layout: center
 ---
 
 # Conclusão
 
-<div class="grid grid-cols-2 gap-8 pt-4">
-
-<div>
-
-### O que foi aprendido
-
-- **POO na prática** — encapsulamento, herança (PanacheEntityBase), relacionamentos JPA
-- **Arquitetura em camadas** — separação clara entre Entity, Repository, Controller e DTO
-- **Padrões de projeto** — Repository Pattern, State Machine, DTO, Injeção de Dependência
-- **Tecnologias modernas** — Java 21, Quarkus, React 19, JWT
-
-</div>
-
-<div>
-
-### Resultados
-
-- Sistema funcional com **54 classes Java** organizadas em **13 módulos**
-- **12 tabelas** no banco de dados gerenciadas via Flyway
-- **2 interfaces** (cliente e administrativo) em React
-- API documentada automaticamente com Swagger
-- Código disponível no GitHub
-
-</div>
-
-</div>
+O projeto entregou um sistema funcional de biblioteca do começo ao fim — cadastro de livros, controle de estoque, reservas, devoluções e multas, tudo funcionando. Aprendemos na prática a organizar um projeto maior, separando bem as responsabilidades, e usamos tecnologias que são relevantes no mercado hoje. 
 
 ---
 transition: fade-out
