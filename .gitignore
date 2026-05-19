@@ -13,3 +13,7 @@ node_modules
 
 # Presentation output.
 /Presentation/dist/**
+
+# Pastas locais não versionadas.
+docs/
+Scripts/

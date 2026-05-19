@@ -167,6 +167,13 @@ function ResourcePanel({ resource }) {
 	const [confirmDeleteKey, setConfirmDeleteKey] = useState(null);
 	const [saving, setSaving] = useState(false);
 	const [lookupData, setLookupData] = useState({});
+	const [deleteToast, setDeleteToast] = useState(null);
+
+	useEffect(() => {
+		if (!deleteToast) return;
+		const t = setTimeout(() => setDeleteToast(null), 3500);
+		return () => clearTimeout(t);
+	}, [deleteToast]);
 
 	const carregarDados = useCallback(async () => {
 		setLoading(true);
@@ -301,10 +308,22 @@ function ResourcePanel({ resource }) {
 			const idPath = resource.idFields.map((f) => item[f]).join("/");
 			await apiClient.delete(resource.path + "/" + idPath);
 			setConfirmDeleteKey(null);
+			setDeleteToast({ ok: true, msg: "Registro excluído com sucesso." });
 			await carregarDados();
 		} catch (e) {
+			setConfirmDeleteKey(null);
 			const errMsg = e.response?.data;
-			setError(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg) || "Erro ao excluir.");
+			let msg;
+			if (typeof errMsg === "string" && !errMsg.trim().startsWith("<")) {
+				msg = errMsg;
+			} else if (errMsg?.message) {
+				msg = errMsg.message;
+			} else if (e.response?.status === 409 || e.response?.status === 500) {
+				msg = "Não foi possível excluir: este registro possui dados vinculados.";
+			} else {
+				msg = "Erro ao excluir.";
+			}
+			setDeleteToast({ ok: false, msg });
 		}
 	}
 
@@ -529,7 +548,18 @@ function ResourcePanel({ resource }) {
 	}
 
 	return (
-		<section className="panel admin-resource-panel">
+		<section className="panel admin-resource-panel" style={{ position: "relative" }}>
+			{deleteToast && (
+				<div style={{
+					position: "fixed", bottom: 24, right: 24, zIndex: 9999,
+					background: deleteToast.ok ? "var(--success, #16a34a)" : "var(--danger, #dc2626)",
+					color: "#fff", padding: "12px 20px", borderRadius: 8,
+					boxShadow: "0 4px 16px rgba(0,0,0,0.18)", fontSize: 14,
+					maxWidth: 360, lineHeight: 1.4,
+				}}>
+					{deleteToast.msg}
+				</div>
+			)}
 			<div className="admin-panel-header">
 				<div>
 					<h3>{resource.label}</h3>

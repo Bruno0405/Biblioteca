@@ -21,7 +21,6 @@ export const resources = [
       { name: "email", label: "Email", type: "text" },
       { name: "endereco", label: "Endereco", type: "text" },
       { name: "bloqueado", label: "Bloqueado", type: "boolean" },
-      { name: "tentativasLogin", label: "Tentativas", type: "number" },
       { name: "emailConfirmado", label: "Email Confirmado", type: "boolean" },
       { name: "senhaCliente", label: "Senha", type: "text", createOnly: true },
     ],
