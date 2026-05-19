@@ -113,6 +113,8 @@ export const resources = [
       { name: "ano", label: "Ano", type: "number" },
       { name: "sinopse", label: "Sinopse", type: "text" },
       { name: "localizacaoFisica", label: "Localizacao", type: "text" },
+      { name: "idAutores", label: "Autores", type: "multi-lookup", lookup: { resource: "autores", labelField: "nomeAutor", idField: "idAutor", multi: true, sourceField: "autores" } },
+      { name: "idGeneros", label: "Gêneros", type: "multi-lookup", lookup: { resource: "generos", labelField: "nomeGenero", idField: "idGenero", multi: true, sourceField: "generos" } },
     ],
   },
   {

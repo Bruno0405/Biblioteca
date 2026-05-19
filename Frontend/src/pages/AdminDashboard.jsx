@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faArrowsRotate,
@@ -47,6 +47,115 @@ const SIDEBAR_GROUPS = [
 	{ label: "Sistema", keys: ["logs", "historico"] },
 ];
 
+// ── Dropdown multiselect com checkboxes ──────────────────────────────────────
+function MultiSelectDropdown({ options, selected, onChange, idField, labelField, placeholder }) {
+	const [open, setOpen] = useState(false);
+	const ref = useRef(null);
+
+	useEffect(() => {
+		function handleClickOutside(e) {
+			if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+		}
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, []);
+
+	function add(id) {
+		const numId = Number(id);
+		if (!selected.includes(numId)) onChange([...selected, numId]);
+	}
+
+	function remove(id) {
+		onChange(selected.filter((i) => i !== Number(id)));
+	}
+
+	const available = options.filter((o) => !selected.includes(Number(o[idField])));
+	const selectedItems = options.filter((o) => selected.includes(Number(o[idField])));
+
+	return (
+		<div ref={ref} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+			{/* Trigger */}
+			<div style={{ position: "relative" }}>
+				<button
+					type="button"
+					onClick={() => setOpen((v) => !v)}
+					style={{
+						width: "100%", textAlign: "left", padding: "7px 32px 7px 10px",
+						background: "var(--bg-2, #f8fafc)", border: "1px solid var(--border, #e2e8f0)",
+						borderRadius: 6, cursor: "pointer", fontSize: 14,
+						color: "var(--text-soft, #94a3b8)",
+						boxShadow: "none", fontFamily: "inherit",
+					}}
+				>
+					{placeholder || "Adicionar..."}
+					<span style={{ position: "absolute", right: 10, top: "50%", transform: open ? "translateY(-50%) rotate(180deg)" : "translateY(-50%)", pointerEvents: "none", fontSize: 11, color: "var(--text-soft, #94a3b8)", transition: "transform .15s" }}>▼</span>
+				</button>
+				{open && (
+					<ul style={{
+						position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
+						background: "var(--bg, #fff)", border: "1px solid var(--border, #e2e8f0)",
+						borderRadius: 6, boxShadow: "0 4px 16px rgba(0,0,0,.10)",
+						margin: 0, padding: "4px 0", listStyle: "none",
+						maxHeight: 200, overflowY: "auto", zIndex: 9999,
+					}}>
+						{available.length === 0 && (
+							<li style={{ padding: "8px 12px", color: "var(--text-soft, #94a3b8)", fontSize: 13 }}>Todos já selecionados</li>
+						)}
+						{available.map((opt) => {
+							const id = opt[idField];
+							return (
+								<li
+									key={id}
+									onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+									onClick={() => add(id)}
+									style={{
+										padding: "7px 12px", cursor: "pointer", fontSize: 14,
+										color: "var(--text, #1e293b)", userSelect: "none",
+									}}
+									onMouseEnter={(e) => e.currentTarget.style.background = "var(--accent-soft, #eff6ff)"}
+									onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+								>
+									{opt[labelField] || id}
+								</li>
+							);
+						})}
+					</ul>
+				)}
+			</div>
+			{/* Selected tags */}
+			{selectedItems.length > 0 && (
+				<div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+					{selectedItems.map((opt) => {
+						const id = opt[idField];
+						return (
+							<span key={id} style={{
+								display: "inline-flex", alignItems: "center", gap: 5,
+								padding: "3px 8px 3px 10px",
+								background: "var(--accent-soft, #eff6ff)",
+								border: "1px solid var(--accent, #3b82f6)",
+								color: "var(--accent, #3b82f6)",
+								borderRadius: 999, fontSize: 13, fontWeight: 500,
+							}}>
+								{opt[labelField] || id}
+								<button
+									type="button"
+									onClick={() => remove(id)}
+									style={{
+										background: "none", border: "none", cursor: "pointer",
+										padding: "0 2px", lineHeight: 1, fontSize: 14,
+										color: "var(--accent, #3b82f6)", display: "flex", alignItems: "center",
+									}}
+									title="Remover"
+								>×</button>
+							</span>
+						);
+					})}
+				</div>
+			)}
+		</div>
+	);
+}
+
 // ── Painel genérico de CRUD ────────────────────────────────────────────────────
 function ResourcePanel({ resource }) {
 	const [items, setItems] = useState([]);
@@ -92,7 +201,7 @@ function ResourcePanel({ resource }) {
 			const map = {};
 			results.forEach(({ key, data }) => { map[key] = Array.isArray(data) ? data : []; });
 			setLookupData(map);
-		}).catch(() => {});
+		}).catch(() => { });
 	}, [resource]);
 
 	function getItemKey(item) {
@@ -115,7 +224,14 @@ function ResourcePanel({ resource }) {
 		setEditItem(item);
 		const data = {};
 		resource.fields.filter((f) => !f.createOnly).forEach((f) => {
-			data[f.name] = item[f.name] ?? "";
+			if (f.lookup?.multi && f.lookup.sourceField) {
+				const sourceData = item[f.lookup.sourceField];
+				const lookupRes = getResourceByKey(f.lookup.resource);
+				const idField = f.lookup.idField || (lookupRes ? lookupRes.idFields[0] : "id");
+				data[f.name] = Array.isArray(sourceData) ? sourceData.map((s) => Number(s[idField])) : [];
+			} else {
+				data[f.name] = item[f.name] ?? "";
+			}
 		});
 		setFormData(data);
 		setError("");
@@ -173,7 +289,7 @@ function ResourcePanel({ resource }) {
 			await carregarDados();
 		} catch (e) {
 			const errMsg = e.response?.data;
-		setError(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg) || "Erro ao salvar. Verifique os dados.");
+			setError(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg) || "Erro ao salvar. Verifique os dados.");
 		} finally {
 			setSaving(false);
 		}
@@ -234,6 +350,24 @@ function ResourcePanel({ resource }) {
 						<option key={opt.value} value={opt.value}>{opt.label}</option>
 					))}
 				</select>
+			);
+		}
+
+		// Multi-select lookup (relação N:N)
+		if (field.lookup?.multi) {
+			const lookupRes = getResourceByKey(field.lookup.resource);
+			const idField = field.lookup.idField || (lookupRes ? lookupRes.idFields[0] : "id");
+			const options = lookupData[field.lookup.resource] || [];
+			const selected = Array.isArray(value) ? value.map(Number) : [];
+			return (
+				<MultiSelectDropdown
+					options={options}
+					selected={selected}
+					onChange={(v) => setField(field.name, v)}
+					idField={idField}
+					labelField={field.lookup.labelField}
+					placeholder="Selecione..."
+				/>
 			);
 		}
 
@@ -330,7 +464,7 @@ function ResourcePanel({ resource }) {
 		return `${d.slice(0, 3)}-${d.slice(3, 4)}-${d.slice(4, 6)}-${d.slice(6, 12)}-${d.slice(12, 13)}`;
 	}
 
-	function resolveCellValue(col, rawValue) {
+	function resolveCellValue(col, rawValue, item = null) {
 		// ID columns: add # prefix
 		if (resource.idFields.includes(col.name)) {
 			return rawValue != null && rawValue !== "" ? `#${rawValue}` : "-";
@@ -348,6 +482,17 @@ function ResourcePanel({ resource }) {
 		if (field.options) {
 			const opt = field.options.find((o) => o.value === String(rawValue));
 			return opt ? opt.label : truncate(rawValue);
+		}
+
+		// Resolve multi-lookup (N:N)
+		if (field.lookup?.multi) {
+			const sourceField = field.lookup.sourceField;
+			const source = item && sourceField ? item[sourceField] : null;
+			if (Array.isArray(source) && source.length > 0) {
+				const names = source.map((s) => s[field.lookup.labelField] || s[field.lookup.idField]).join(", ");
+				return truncate(names);
+			}
+			return "-";
 		}
 
 		// Resolve nome do lookup (FK)
@@ -421,7 +566,7 @@ function ResourcePanel({ resource }) {
 									return (
 										<tr key={itemKey}>
 											{tableColumns.map((c) => (
-												<td key={c.name}>{resolveCellValue(c, item[c.name])}</td>
+												<td key={c.name}>{resolveCellValue(c, item[c.name], item)}</td>
 											))}
 											<td style={{ whiteSpace: "nowrap" }}>
 												{resource.supportsUpdate && (
