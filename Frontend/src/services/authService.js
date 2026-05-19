@@ -12,7 +12,7 @@ export async function login(email, senha, tipo) {
 
     if (error.response?.status === 0 || error.code === "ERR_NETWORK") {
       throw new Error(
-        "Nao foi possivel conectar ao backend em http://localhost:8080."
+        "Nao foi possivel conectar ao backend em https://biblioteca-0k9o.onrender.com."
       );
     }
 
